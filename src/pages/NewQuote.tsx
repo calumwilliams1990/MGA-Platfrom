@@ -179,22 +179,22 @@ export default function NewQuote() {
           { label: "Terrorism Liability" },
         ]}
       />
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto bg-sidebar">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold">Terrorism Liability Quote</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-2xl font-bold text-sidebar-foreground">Terrorism Liability Quote</h1>
+              <p className="text-sidebar-foreground/70">
                 Complete the form to receive your quote
               </p>
             </div>
-            <Button variant="outline">Save & Exit</Button>
+            <Button variant="outline" className="bg-card text-card-foreground border-sidebar-border hover:bg-card/90">Save & Exit</Button>
           </div>
           
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-muted-foreground">Step {currentStep} of 7</span>
-              <span className="text-sm font-medium">{Math.round((currentStep / 7) * 100)}%</span>
+              <span className="text-sm text-sidebar-foreground/70">Step {currentStep} of 7</span>
+              <span className="text-sm font-medium text-sidebar-foreground">{Math.round((currentStep / 7) * 100)}%</span>
             </div>
             <Progress value={(currentStep / 7) * 100} className="h-2" />
           </div>
