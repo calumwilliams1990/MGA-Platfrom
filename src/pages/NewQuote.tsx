@@ -29,6 +29,8 @@ export interface QuoteData {
   
   // Step 6 - Underwriting
   priorLosses: boolean;
+  priorLossDetails: string;
+  priorLossDocuments: File[];
   numberOfEmployees: string;
   annualRevenue: number;
   
@@ -63,6 +65,8 @@ const initialQuoteData: QuoteData = {
   expiryDate: "",
   locations: [],
   priorLosses: false,
+  priorLossDetails: "",
+  priorLossDocuments: [],
   numberOfEmployees: "0-100",
   annualRevenue: 0,
   confirmed: false,
