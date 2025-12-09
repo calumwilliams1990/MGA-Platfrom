@@ -201,9 +201,9 @@ export function StepCoverage({
               ))}
             </SelectContent>
           </Select>
-          {quoteData.deductible > quoteData.policyLimit * 0.1 && (
+          {quoteData.deductible > Math.min(quoteData.policyLimit * 0.1, 2500000) && (
             <p className="text-sm text-warning">
-              The deductible cannot be more than 10% of the loss limit
+              The deductible cannot be more than 10% of the loss limit or $2,500,000, whichever is lower
             </p>
           )}
         </div>
