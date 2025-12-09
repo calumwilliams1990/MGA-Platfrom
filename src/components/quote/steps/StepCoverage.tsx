@@ -133,7 +133,7 @@ export function StepCoverage({
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 h-5">
             <Label>Loss Limit</Label>
             <Tooltip>
               <TooltipTrigger>
@@ -149,7 +149,7 @@ export function StepCoverage({
               <Button
                 variant="outline"
                 role="combobox"
-                className="w-full justify-between font-normal"
+                className="w-full justify-between font-normal h-10"
               >
                 {quoteData.policyLimit ? formatCurrency(quoteData.policyLimit) : "Select limit"}
                 <span className="text-muted-foreground text-xs ml-2">▼</span>
@@ -183,7 +183,9 @@ export function StepCoverage({
         </div>
 
         <div className="space-y-2">
-          <Label>Deductible</Label>
+          <div className="h-5 flex items-center">
+            <Label>Deductible</Label>
+          </div>
           <Select
             value={quoteData.deductible.toString()}
             onValueChange={(value) =>
