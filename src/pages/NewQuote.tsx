@@ -3,7 +3,7 @@ import { AppHeader } from "@/components/layout/AppHeader";
 import { QuoteWizard } from "@/components/quote/QuoteWizard";
 import { PremiumSidebar } from "@/components/quote/PremiumSidebar";
 import { Button } from "@/components/ui/button";
-
+import { Progress } from "@/components/ui/progress";
 export interface QuoteData {
   // Step 1 - Documentation
   documents: File[];
@@ -181,7 +181,7 @@ export default function NewQuote() {
       />
       <div className="flex-1 overflow-auto">
         <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl font-bold">Terrorism Liability Quote</h1>
               <p className="text-muted-foreground">
@@ -189,6 +189,14 @@ export default function NewQuote() {
               </p>
             </div>
             <Button variant="outline">Save & Exit</Button>
+          </div>
+          
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-muted-foreground">Step {currentStep} of 7</span>
+              <span className="text-sm font-medium">{Math.round((currentStep / 7) * 100)}%</span>
+            </div>
+            <Progress value={(currentStep / 7) * 100} className="h-2" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
