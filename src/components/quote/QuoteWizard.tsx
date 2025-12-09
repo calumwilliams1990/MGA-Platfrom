@@ -118,65 +118,6 @@ export function QuoteWizard({
   };
 
   return (
-    <div className="flex gap-6">
-      {/* Step Sidebar */}
-      <Card className="w-64 p-5 h-fit shrink-0">
-        <div className="space-y-1">
-          {steps.map((step, index) => {
-            const isCompleted = step.id < currentStep;
-            const isCurrent = step.id === currentStep;
-            const isUpcoming = step.id > currentStep;
-
-            return (
-              <div key={step.id} className="flex items-start gap-3">
-                <div className="flex flex-col items-center">
-                  <div
-                    className={cn(
-                      "h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-colors",
-                      isCompleted &&
-                        "bg-primary border-primary text-primary-foreground",
-                      isCurrent &&
-                        "bg-primary border-primary text-primary-foreground",
-                      isUpcoming && "border-border text-muted-foreground"
-                    )}
-                  >
-                    {isCompleted ? (
-                      <Check className="h-4 w-4" />
-                    ) : (
-                      step.id
-                    )}
-                  </div>
-                  {index < steps.length - 1 && (
-                    <div
-                      className={cn(
-                        "w-0.5 h-8 transition-colors",
-                        isCompleted ? "bg-primary" : "bg-border"
-                      )}
-                    />
-                  )}
-                </div>
-                <div className="pt-1">
-                  <p
-                    className={cn(
-                      "text-sm font-medium",
-                      isCurrent && "text-foreground",
-                      !isCurrent && "text-muted-foreground"
-                    )}
-                  >
-                    {step.title}
-                  </p>
-                  {step.optional && (
-                    <span className="text-xs text-muted-foreground">Opt</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
-
-      {/* Step Content */}
-      <Card className="flex-1 p-6">{renderStep()}</Card>
-    </div>
+    <Card className="p-6">{renderStep()}</Card>
   );
 }

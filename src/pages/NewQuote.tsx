@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { Check } from "lucide-react";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { QuoteWizard } from "@/components/quote/QuoteWizard";
 import { PremiumSidebar } from "@/components/quote/PremiumSidebar";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 export interface QuoteData {
   // Step 1 - Documentation
   documents: File[];
@@ -191,12 +192,55 @@ export default function NewQuote() {
             <Button variant="outline" className="bg-card text-card-foreground border-sidebar-border hover:bg-card/90">Save & Exit</Button>
           </div>
           
+          {/* Horizontal Step Progress */}
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-sidebar-foreground/70">Step {currentStep} of 7</span>
-              <span className="text-sm font-medium text-sidebar-foreground">{Math.round((currentStep / 7) * 100)}%</span>
+            <div className="flex items-center justify-between">
+              {[
+                { id: 1, title: "Documentation" },
+                { id: 2, title: "Policyholder" },
+                { id: 3, title: "Business Info" },
+                { id: 4, title: "Coverage" },
+                { id: 5, title: "Locations" },
+                { id: 6, title: "Underwriting" },
+                { id: 7, title: "Review" },
+              ].map((step, index) => {
+                const isCompleted = step.id < currentStep;
+                const isCurrent = step.id === currentStep;
+                
+                return (
+                  <div key={step.id} className="flex items-center flex-1">
+                    <div className="flex flex-col items-center">
+                      <div
+                        className={cn(
+                          "h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-colors",
+                          isCompleted && "bg-primary border-primary text-primary-foreground",
+                          isCurrent && "bg-primary border-primary text-primary-foreground",
+                          !isCompleted && !isCurrent && "border-border bg-card text-muted-foreground"
+                        )}
+                      >
+                        {isCompleted ? <Check className="h-4 w-4" /> : step.id}
+                      </div>
+                      <span
+                        className={cn(
+                          "text-xs mt-1 text-center whitespace-nowrap",
+                          isCurrent ? "text-sidebar-foreground font-medium" : "text-sidebar-foreground/60"
+                        )}
+                      >
+                        {step.title}
+                      </span>
+                    </div>
+                    {index < 6 && (
+                      <div
+                        className={cn(
+                          "flex-1 h-0.5 mx-2 transition-colors",
+                          isCompleted ? "bg-primary" : "bg-border"
+                        )}
+                      />
+                    )}
+                  </div>
+                );
+              })}
             </div>
-            <Progress value={(currentStep / 7) * 100} className="h-2" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
