@@ -23,7 +23,7 @@ export default function Dashboard() {
         <div className="p-6 space-y-6">
           {/* Welcome Header */}
           <div className="mb-2">
-            <h1 className="text-2xl font-bold">{getGreeting()}, Josh H!</h1>
+            <h1 className="text-2xl font-bold">{getGreeting()}, Calum W!</h1>
             <p className="text-muted-foreground">
               Here's what's happening with your portfolio today
             </p>
