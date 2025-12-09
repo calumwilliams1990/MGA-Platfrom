@@ -89,7 +89,7 @@ export function StepReview({
     },
     { label: "Number of Employees", value: quoteData.numberOfEmployees },
     { label: "Annual Total Revenue", value: formatCurrency(quoteData.annualRevenue) },
-    { label: "Terrorism Liability Limit", value: formatCurrency(quoteData.policyLimit) },
+    { label: "Loss Limit", value: formatCurrency(quoteData.policyLimit) },
     { label: "Deductible", value: formatCurrency(quoteData.deductible) },
   ];
 
