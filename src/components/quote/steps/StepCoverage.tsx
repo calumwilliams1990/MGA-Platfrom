@@ -59,7 +59,9 @@ export function StepCoverage({
   onBack,
 }: StepCoverageProps) {
   const [lossLimitOpen, setLossLimitOpen] = useState(false);
+  const [deductibleOpen, setDeductibleOpen] = useState(false);
   const [customLimitInput, setCustomLimitInput] = useState("");
+  const [customDeductibleInput, setCustomDeductibleInput] = useState("");
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -74,6 +76,8 @@ export function StepCoverage({
     return parseInt(value.replace(/[^0-9]/g, "")) || 0;
   };
 
+  const maxDeductible = Math.min(quoteData.policyLimit * 0.1, 2500000);
+
   const handleCustomLimitChange = (value: string) => {
     setCustomLimitInput(value);
     const parsed = parseCurrency(value);
@@ -86,6 +90,20 @@ export function StepCoverage({
     updateQuoteData({ policyLimit: value });
     setCustomLimitInput("");
     setLossLimitOpen(false);
+  };
+
+  const handleCustomDeductibleChange = (value: string) => {
+    setCustomDeductibleInput(value);
+    const parsed = parseCurrency(value);
+    if (parsed >= 0) {
+      updateQuoteData({ deductible: parsed });
+    }
+  };
+
+  const handleSelectDeductible = (value: number) => {
+    updateQuoteData({ deductible: value });
+    setCustomDeductibleInput("");
+    setDeductibleOpen(false);
   };
 
   return (
@@ -186,24 +204,43 @@ export function StepCoverage({
           <div className="h-5 flex items-center">
             <Label>Deductible</Label>
           </div>
-          <Select
-            value={quoteData.deductible.toString()}
-            onValueChange={(value) =>
-              updateQuoteData({ deductible: parseInt(value) })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select deductible" />
-            </SelectTrigger>
-            <SelectContent>
-              {deductibles.map((ded) => (
-                <SelectItem key={ded.value} value={ded.value.toString()}>
-                  {ded.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {quoteData.deductible > Math.min(quoteData.policyLimit * 0.1, 2500000) && (
+          <Popover open={deductibleOpen} onOpenChange={setDeductibleOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                className="w-full justify-between font-normal h-10"
+              >
+                {formatCurrency(quoteData.deductible)}
+                <span className="text-muted-foreground text-xs ml-2">▼</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-popover" align="start">
+              <div className="p-2 border-b">
+                <Input
+                  placeholder="Type custom amount"
+                  value={customDeductibleInput}
+                  onChange={(e) => handleCustomDeductibleChange(e.target.value)}
+                  className="h-9"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Or select from common options below
+                </p>
+              </div>
+              <div className="max-h-48 overflow-y-auto p-1">
+                {deductibles.map((ded) => (
+                  <button
+                    key={ded.value}
+                    onClick={() => handleSelectDeductible(ded.value)}
+                    className="w-full text-left px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                  >
+                    {ded.label}
+                  </button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+          {quoteData.deductible > maxDeductible && (
             <p className="text-sm text-warning">
               The deductible cannot be more than 10% of the loss limit or $2,500,000, whichever is lower
             </p>
