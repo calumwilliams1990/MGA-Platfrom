@@ -4,6 +4,7 @@ import { AppHeader } from "@/components/layout/AppHeader";
 import { QuoteWizard } from "@/components/quote/QuoteWizard";
 import { PremiumSidebar } from "@/components/quote/PremiumSidebar";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 export interface QuoteData {
   // Step 1 - Documentation
@@ -192,6 +193,15 @@ export default function NewQuote() {
             <Button variant="outline" className="bg-card text-card-foreground border-sidebar-border hover:bg-card/90">Save & Exit</Button>
           </div>
           
+          {/* Progress Bar */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-sidebar-foreground/70">Step {currentStep} of 7</span>
+              <span className="text-sm font-medium text-sidebar-foreground">{Math.round((currentStep / 7) * 100)}%</span>
+            </div>
+            <Progress value={(currentStep / 7) * 100} className="h-2" />
+          </div>
+
           {/* Horizontal Step Progress */}
           <div className="mb-6">
             <div className="flex items-center justify-between">
