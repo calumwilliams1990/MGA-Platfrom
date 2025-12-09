@@ -87,23 +87,23 @@ export function AppSidebar() {
 
   return (
     <Sidebar
-      className="border-r-0"
+      className="border-r border-app-sidebar-border bg-app-sidebar"
       collapsible="icon"
     >
-      <div className="flex h-16 items-center px-4 border-b border-sidebar-border">
+      <div className="flex h-16 items-center px-4 border-b border-app-sidebar-border">
         <Link to="/" className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">LP</span>
           </div>
           {!collapsed && (
-            <span className="font-semibold text-sidebar-foreground">
+            <span className="font-semibold text-app-sidebar-foreground">
               Liability <span className="italic font-normal">Pro</span>
             </span>
           )}
         </Link>
       </div>
 
-      <SidebarContent className="px-2 py-4">
+      <SidebarContent className="px-2 py-4 bg-app-sidebar">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -117,9 +117,9 @@ export function AppSidebar() {
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton
                           className={cn(
-                            "w-full justify-between",
+                            "w-full justify-between text-app-sidebar-foreground hover:bg-app-sidebar-accent",
                             isActive(item.url) &&
-                              "bg-sidebar-accent text-sidebar-accent-foreground"
+                              "bg-app-sidebar-accent text-app-sidebar-foreground"
                           )}
                         >
                           <div className="flex items-center gap-3">
@@ -143,9 +143,9 @@ export function AppSidebar() {
                               key={child.url}
                               to={child.url}
                               className={cn(
-                                "block py-2 px-3 rounded-md text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors",
+                                "block py-2 px-3 rounded-md text-sm text-app-sidebar-foreground/70 hover:text-app-sidebar-foreground hover:bg-app-sidebar-accent transition-colors",
                                 isActive(child.url) &&
-                                  "bg-sidebar-accent text-sidebar-foreground"
+                                  "bg-app-sidebar-accent text-app-sidebar-foreground"
                               )}
                             >
                               {child.title}
@@ -158,8 +158,9 @@ export function AppSidebar() {
                     <SidebarMenuButton
                       asChild
                       className={cn(
+                        "text-app-sidebar-foreground hover:bg-app-sidebar-accent",
                         isActive(item.url) &&
-                          "bg-sidebar-accent text-sidebar-accent-foreground"
+                          "bg-app-sidebar-accent text-app-sidebar-foreground"
                       )}
                     >
                       <Link to={item.url} className="flex items-center gap-3">
@@ -175,28 +176,28 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-4">
+      <SidebarFooter className="border-t border-app-sidebar-border p-4 bg-app-sidebar">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
             <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback className="bg-sidebar-accent text-sidebar-foreground">
+            <AvatarFallback className="bg-app-sidebar-accent text-app-sidebar-foreground">
               CW
             </AvatarFallback>
           </Avatar>
           {!collapsed && (
             <>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-sidebar-foreground truncate">
+                <p className="text-sm font-medium text-app-sidebar-foreground truncate">
                   Calum W
                 </p>
-                <p className="text-xs text-sidebar-foreground/60 truncate">
+                <p className="text-xs text-app-sidebar-foreground/60 truncate">
                   calum@test.com
                 </p>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="p-1 hover:bg-sidebar-accent rounded">
-                    <MoreVertical className="h-4 w-4 text-sidebar-foreground/60" />
+                  <button className="p-1 hover:bg-app-sidebar-accent rounded">
+                    <MoreVertical className="h-4 w-4 text-app-sidebar-foreground/60" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
