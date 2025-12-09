@@ -69,7 +69,7 @@ export function StepCoverage({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Terrorism Liability Limit</Label>
+          <Label>Loss Limit</Label>
           <Select
             value={quoteData.policyLimit.toString()}
             onValueChange={(value) =>
