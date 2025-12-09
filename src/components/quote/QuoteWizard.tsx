@@ -120,7 +120,7 @@ export function QuoteWizard({
   return (
     <div className="flex gap-6">
       {/* Step Sidebar */}
-      <Card className="w-64 p-5 h-fit shrink-0 bg-primary/10 border-primary/20">
+      <Card className="w-64 p-5 h-fit shrink-0">
         <div className="space-y-1">
           {steps.map((step, index) => {
             const isCompleted = step.id < currentStep;
