@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Info, ChevronLeft } from "lucide-react";
 import { addYears, format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface StepCoverageProps {
   quoteData: QuoteData;
@@ -32,6 +38,7 @@ const policyLimits = [
   { value: 25000000, label: "$25,000,000" },
   { value: 50000000, label: "$50,000,000" },
   { value: 100000000, label: "$100,000,000" },
+  { value: 250000000, label: "$250,000,000" },
 ];
 
 const deductibles = [
@@ -43,13 +50,43 @@ const deductibles = [
   { value: 100000, label: "$100,000" },
 ];
 
+const MAX_LOSS_LIMIT = 250000000;
+
 export function StepCoverage({
   quoteData,
   updateQuoteData,
   onNext,
   onBack,
 }: StepCoverageProps) {
-  const isValid = quoteData.inceptionDate !== "" && quoteData.expiryDate !== "";
+  const [lossLimitOpen, setLossLimitOpen] = useState(false);
+  const [customLimitInput, setCustomLimitInput] = useState("");
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  const parseCurrency = (value: string) => {
+    return parseInt(value.replace(/[^0-9]/g, "")) || 0;
+  };
+
+  const handleCustomLimitChange = (value: string) => {
+    setCustomLimitInput(value);
+    const parsed = parseCurrency(value);
+    if (parsed > 0 && parsed <= MAX_LOSS_LIMIT) {
+      updateQuoteData({ policyLimit: parsed });
+    }
+  };
+
+  const handleSelectLimit = (value: number) => {
+    updateQuoteData({ policyLimit: value });
+    setCustomLimitInput("");
+    setLossLimitOpen(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -96,24 +133,53 @@ export function StepCoverage({
         </div>
 
         <div className="space-y-2">
-          <Label>Loss Limit</Label>
-          <Select
-            value={quoteData.policyLimit.toString()}
-            onValueChange={(value) =>
-              updateQuoteData({ policyLimit: parseInt(value) })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select limit" />
-            </SelectTrigger>
-            <SelectContent>
-              {policyLimits.map((limit) => (
-                <SelectItem key={limit.value} value={limit.value.toString()}>
-                  {limit.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            <Label>Loss Limit</Label>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-3.5 w-3.5 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Select a preset or type a custom amount up to $250,000,000</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <Popover open={lossLimitOpen} onOpenChange={setLossLimitOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                className="w-full justify-between font-normal"
+              >
+                {quoteData.policyLimit ? formatCurrency(quoteData.policyLimit) : "Select limit"}
+                <span className="text-muted-foreground text-xs ml-2">▼</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-popover" align="start">
+              <div className="p-2 border-b">
+                <Input
+                  placeholder="Type custom amount (max $250M)"
+                  value={customLimitInput}
+                  onChange={(e) => handleCustomLimitChange(e.target.value)}
+                  className="h-9"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Or select from common limits below
+                </p>
+              </div>
+              <div className="max-h-48 overflow-y-auto p-1">
+                {policyLimits.map((limit) => (
+                  <button
+                    key={limit.value}
+                    onClick={() => handleSelectLimit(limit.value)}
+                    className="w-full text-left px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                  >
+                    {limit.label}
+                  </button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
 
         <div className="space-y-2">
