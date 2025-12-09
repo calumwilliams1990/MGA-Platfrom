@@ -180,17 +180,17 @@ export function AppSidebar() {
           <Avatar className="h-10 w-10">
             <AvatarImage src="/placeholder.svg" />
             <AvatarFallback className="bg-sidebar-accent text-sidebar-foreground">
-              JH
+              CW
             </AvatarFallback>
           </Avatar>
           {!collapsed && (
             <>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-sidebar-foreground truncate">
-                  Josh H
+                  Calum W
                 </p>
                 <p className="text-xs text-sidebar-foreground/60 truncate">
-                  joshh@gmail.com
+                  calum@test.com
                 </p>
               </div>
               <DropdownMenu>
