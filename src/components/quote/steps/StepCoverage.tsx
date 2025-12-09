@@ -69,6 +69,26 @@ export function StepCoverage({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
+          <Label htmlFor="inceptionDate">Inception Date</Label>
+          <Input
+            id="inceptionDate"
+            type="date"
+            value={quoteData.inceptionDate}
+            onChange={(e) => updateQuoteData({ inceptionDate: e.target.value })}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="expiryDate">Expiry Date</Label>
+          <Input
+            id="expiryDate"
+            type="date"
+            value={quoteData.expiryDate}
+            onChange={(e) => updateQuoteData({ expiryDate: e.target.value })}
+          />
+        </div>
+
+        <div className="space-y-2">
           <Label>Loss Limit</Label>
           <Select
             value={quoteData.policyLimit.toString()}
@@ -108,26 +128,6 @@ export function StepCoverage({
               ))}
             </SelectContent>
           </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="inceptionDate">Inception Date</Label>
-          <Input
-            id="inceptionDate"
-            type="date"
-            value={quoteData.inceptionDate}
-            onChange={(e) => updateQuoteData({ inceptionDate: e.target.value })}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="expiryDate">Expiry Date</Label>
-          <Input
-            id="expiryDate"
-            type="date"
-            value={quoteData.expiryDate}
-            onChange={(e) => updateQuoteData({ expiryDate: e.target.value })}
-          />
         </div>
       </div>
 
