@@ -144,7 +144,7 @@ export function StepCoverage({
           <ChevronLeft className="h-4 w-4" />
           Back
         </Button>
-        <Button onClick={onNext} disabled={!isValid}>
+        <Button onClick={onNext}>
           Continue
         </Button>
       </div>
