@@ -70,6 +70,12 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        "app-sidebar": {
+          DEFAULT: "hsl(var(--app-sidebar-background))",
+          foreground: "hsl(var(--app-sidebar-foreground))",
+          accent: "hsl(var(--app-sidebar-accent))",
+          border: "hsl(var(--app-sidebar-border))",
+        },
         insurance: {
           urgent: "hsl(var(--insurance-urgent))",
           referred: "hsl(var(--insurance-referred))",
