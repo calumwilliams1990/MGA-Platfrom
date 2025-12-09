@@ -93,7 +93,7 @@ export function StepUnderwriting({
           </RadioGroup>
           {quoteData.priorLosses && (
             <p className="text-xs text-insurance-referred">
-              Prior losses will result in a 25% premium load
+              This will refer to an underwriter for further review. Please ensure this is only for perils covered under this policy and provide as much additional information as possible.
             </p>
           )}
         </div>
