@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Check, Save } from "lucide-react";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { QuoteWizard } from "@/components/quote/QuoteWizard";
 import { PremiumSidebar } from "@/components/quote/PremiumSidebar";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 export interface QuoteData {
   // Step 1 - Documentation
   documents: File[];
@@ -75,8 +78,11 @@ const initialQuoteData: QuoteData = {
 };
 
 export default function NewQuote() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [quoteData, setQuoteData] = useState<QuoteData>(initialQuoteData);
+  const [saving, setSaving] = useState(false);
 
   const updateQuoteData = (updates: Partial<QuoteData>) => {
     setQuoteData((prev) => ({ ...prev, ...updates }));
@@ -173,6 +179,54 @@ export default function NewQuote() {
     };
   };
 
+  const savePolicy = async () => {
+    setSaving(true);
+    try {
+      const currentReferralStatus = checkReferralStatus();
+      const currentPremium = calculatePremium();
+
+      const { error } = await supabase.from("policies").insert([{
+        status: "draft",
+        insured_name: quoteData.insuredName || null,
+        mailing_address: quoteData.mailingAddress || null,
+        occupancy_type: quoteData.occupancyType || null,
+        policy_limit: quoteData.policyLimit || null,
+        deductible: quoteData.deductible || null,
+        inception_date: quoteData.inceptionDate || null,
+        expiry_date: quoteData.expiryDate || null,
+        prior_losses: quoteData.priorLosses,
+        prior_loss_details: quoteData.priorLossDetails || null,
+        number_of_employees: quoteData.numberOfEmployees || null,
+        annual_revenue: quoteData.annualRevenue || null,
+        confirmed: quoteData.confirmed,
+        manual_referral: quoteData.manualReferral,
+        referral_reason: quoteData.referralReason || null,
+        locations: JSON.parse(JSON.stringify(quoteData.locations)),
+        estimated_premium: currentPremium || null,
+        referral_required: currentReferralStatus.required,
+        referral_reasons: currentReferralStatus.reasons,
+      }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Policy saved",
+        description: "Your policy has been saved as a draft.",
+      });
+
+      navigate("/policies");
+    } catch (error) {
+      console.error("Error saving policy:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save policy. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const referralStatus = checkReferralStatus();
   const premium = calculatePremium();
 
@@ -194,7 +248,15 @@ export default function NewQuote() {
                 Complete the form to receive your quote
               </p>
             </div>
-            <Button variant="outline" className="bg-card text-card-foreground border-sidebar-border hover:bg-card/90">Save & Exit</Button>
+            <Button 
+              variant="outline" 
+              className="bg-card text-card-foreground border-sidebar-border hover:bg-card/90 gap-2"
+              onClick={savePolicy}
+              disabled={saving}
+            >
+              <Save className="h-4 w-4" />
+              {saving ? "Saving..." : "Save & Exit"}
+            </Button>
           </div>
           
           {/* Progress Bar */}

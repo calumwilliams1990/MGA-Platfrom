@@ -14,7 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      policies: {
+        Row: {
+          annual_revenue: number | null
+          confirmed: boolean | null
+          created_at: string
+          deductible: number | null
+          estimated_premium: number | null
+          expiry_date: string | null
+          id: string
+          inception_date: string | null
+          insured_name: string | null
+          locations: Json | null
+          mailing_address: string | null
+          manual_referral: boolean | null
+          number_of_employees: string | null
+          occupancy_type: string | null
+          policy_limit: number | null
+          prior_loss_details: string | null
+          prior_losses: boolean | null
+          referral_reason: string | null
+          referral_reasons: string[] | null
+          referral_required: boolean | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          annual_revenue?: number | null
+          confirmed?: boolean | null
+          created_at?: string
+          deductible?: number | null
+          estimated_premium?: number | null
+          expiry_date?: string | null
+          id?: string
+          inception_date?: string | null
+          insured_name?: string | null
+          locations?: Json | null
+          mailing_address?: string | null
+          manual_referral?: boolean | null
+          number_of_employees?: string | null
+          occupancy_type?: string | null
+          policy_limit?: number | null
+          prior_loss_details?: string | null
+          prior_losses?: boolean | null
+          referral_reason?: string | null
+          referral_reasons?: string[] | null
+          referral_required?: boolean | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          annual_revenue?: number | null
+          confirmed?: boolean | null
+          created_at?: string
+          deductible?: number | null
+          estimated_premium?: number | null
+          expiry_date?: string | null
+          id?: string
+          inception_date?: string | null
+          insured_name?: string | null
+          locations?: Json | null
+          mailing_address?: string | null
+          manual_referral?: boolean | null
+          number_of_employees?: string | null
+          occupancy_type?: string | null
+          policy_limit?: number | null
+          prior_loss_details?: string | null
+          prior_losses?: boolean | null
+          referral_reason?: string | null
+          referral_reasons?: string[] | null
+          referral_required?: boolean | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
