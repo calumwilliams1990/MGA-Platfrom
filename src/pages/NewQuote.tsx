@@ -219,26 +219,30 @@ export default function NewQuote() {
                 
                 return (
                   <div key={step.id} className="flex items-center flex-1">
-                    <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep(step.id)}
+                      className="flex flex-col items-center cursor-pointer group"
+                    >
                       <div
                         className={cn(
-                          "h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-colors",
+                          "h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-all",
                           isCompleted && "bg-primary border-primary text-primary-foreground",
                           isCurrent && "bg-primary border-primary text-primary-foreground",
-                          !isCompleted && !isCurrent && "border-border bg-card text-muted-foreground"
+                          !isCompleted && !isCurrent && "border-border bg-card text-muted-foreground group-hover:border-primary/50"
                         )}
                       >
                         {isCompleted ? <Check className="h-4 w-4" /> : step.id}
                       </div>
                       <span
                         className={cn(
-                          "text-xs mt-1 text-center whitespace-nowrap",
-                          isCurrent ? "text-sidebar-foreground font-medium" : "text-sidebar-foreground/60"
+                          "text-xs mt-1 text-center whitespace-nowrap transition-colors",
+                          isCurrent ? "text-sidebar-foreground font-medium" : "text-sidebar-foreground/60 group-hover:text-sidebar-foreground"
                         )}
                       >
                         {step.title}
                       </span>
-                    </div>
+                    </button>
                     {index < 6 && (
                       <div
                         className={cn(
