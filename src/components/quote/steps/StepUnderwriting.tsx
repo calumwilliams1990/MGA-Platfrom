@@ -1,7 +1,10 @@
-import { Info, ChevronLeft } from "lucide-react";
+import { useCallback } from "react";
+import { Info, ChevronLeft, Upload, X, FileText } from "lucide-react";
+import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { QuoteData } from "@/pages/NewQuote";
 import {
@@ -50,6 +53,27 @@ export function StepUnderwriting({
     return parseInt(value.replace(/[^0-9]/g, "")) || 0;
   };
 
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    updateQuoteData({
+      priorLossDocuments: [...quoteData.priorLossDocuments, ...acceptedFiles],
+    });
+  }, [quoteData.priorLossDocuments, updateQuoteData]);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "application/pdf": [".pdf"],
+      "image/*": [".png", ".jpg", ".jpeg"],
+      "application/msword": [".doc"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+    },
+  });
+
+  const removeDocument = (index: number) => {
+    const newDocs = quoteData.priorLossDocuments.filter((_, i) => i !== index);
+    updateQuoteData({ priorLossDocuments: newDocs });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
@@ -91,10 +115,73 @@ export function StepUnderwriting({
               </Label>
             </div>
           </RadioGroup>
+          
           {quoteData.priorLosses && (
-            <p className="text-xs text-insurance-referred">
-              This will refer to an underwriter for further review. Please ensure this is only for perils covered under this policy and provide as much additional information as possible.
-            </p>
+            <div className="space-y-4 pt-2">
+              <p className="text-xs text-insurance-referred">
+                This will refer to an underwriter for further review. Please ensure this is only for perils covered under this policy and provide as much additional information as possible.
+              </p>
+              
+              {/* Prior Loss Details */}
+              <div className="space-y-2">
+                <Label htmlFor="priorLossDetails">Loss Details</Label>
+                <Textarea
+                  id="priorLossDetails"
+                  placeholder="Please provide details about prior losses including dates, amounts, and circumstances..."
+                  value={quoteData.priorLossDetails}
+                  onChange={(e) => updateQuoteData({ priorLossDetails: e.target.value })}
+                  rows={4}
+                />
+              </div>
+
+              {/* Document Upload */}
+              <div className="space-y-2">
+                <Label>Supporting Documents</Label>
+                <div
+                  {...getRootProps()}
+                  className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                    isDragActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <input {...getInputProps()} />
+                  <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm font-medium">
+                    {isDragActive ? "Drop files here" : "Drag & drop files or click to upload"}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    PDF, DOC, DOCX, PNG, JPG accepted
+                  </p>
+                </div>
+
+                {/* Uploaded Files List */}
+                {quoteData.priorLossDocuments.length > 0 && (
+                  <div className="space-y-2 mt-3">
+                    {quoteData.priorLossDocuments.map((file, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-2 bg-muted rounded-lg"
+                      >
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm truncate max-w-[200px]">{file.name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            ({(file.size / 1024).toFixed(1)} KB)
+                          </span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => removeDocument(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </div>
 
