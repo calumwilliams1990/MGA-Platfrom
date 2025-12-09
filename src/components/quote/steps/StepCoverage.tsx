@@ -1,4 +1,5 @@
 import { Info, ChevronLeft } from "lucide-react";
+import { addYears, format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -74,7 +75,13 @@ export function StepCoverage({
             id="inceptionDate"
             type="date"
             value={quoteData.inceptionDate}
-            onChange={(e) => updateQuoteData({ inceptionDate: e.target.value })}
+            onChange={(e) => {
+              const inceptionDate = e.target.value;
+              const expiryDate = inceptionDate 
+                ? format(addYears(new Date(inceptionDate), 1), "yyyy-MM-dd")
+                : "";
+              updateQuoteData({ inceptionDate, expiryDate });
+            }}
           />
         </div>
 
