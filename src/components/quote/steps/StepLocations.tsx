@@ -31,6 +31,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -159,6 +166,51 @@ export function StepLocations({
     updateQuoteData({
       locations: quoteData.locations.filter((loc) => loc.id !== id),
     });
+  };
+
+  // Edit location state
+  const [editingLocation, setEditingLocation] = useState<Location | null>(null);
+  const [editAddress, setEditAddress] = useState("");
+  const [editZipCode, setEditZipCode] = useState("");
+  const [editLocationName, setEditLocationName] = useState("");
+
+  const openEditDialog = (location: Location) => {
+    setEditingLocation(location);
+    setEditAddress(location.address);
+    setEditZipCode(location.zipCode);
+    setEditLocationName(location.name || "");
+  };
+
+  const saveEditedLocation = async () => {
+    if (!editingLocation || !editAddress.trim() || !editZipCode.trim()) return;
+
+    const zip = editZipCode.trim();
+    const riskInfo = await fetchZipRiskGrade(zip);
+
+    // Determine status based on risk grade
+    let status: Location["status"] = "accepted";
+    if (riskInfo.risk_grade === "A" || riskInfo.risk_grade === "D" || riskInfo.risk_grade === "E") {
+      status = "referred";
+    }
+
+    const updatedLocation: Location = {
+      ...editingLocation,
+      address: editAddress.trim(),
+      name: editLocationName || undefined,
+      zipCode: zip,
+      state: riskInfo.state || "Unknown",
+      county: riskInfo.county || "Unknown",
+      riskGrade: riskInfo.risk_grade,
+      status,
+    };
+
+    updateQuoteData({
+      locations: quoteData.locations.map((loc) =>
+        loc.id === editingLocation.id ? updatedLocation : loc
+      ),
+    });
+
+    setEditingLocation(null);
   };
 
   const filteredLocations = quoteData.locations.filter((loc) => {
@@ -381,7 +433,7 @@ export function StepLocations({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => openEditDialog(location)}>Edit</DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => removeLocation(location.id)}
@@ -411,6 +463,50 @@ export function StepLocations({
         </Button>
         <Button onClick={onNext}>Continue</Button>
       </div>
+
+      {/* Edit Location Dialog */}
+      <Dialog open={!!editingLocation} onOpenChange={(open) => !open && setEditingLocation(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Location</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-address">Street Address</Label>
+              <Input
+                id="edit-address"
+                value={editAddress}
+                onChange={(e) => setEditAddress(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-zip">ZIP Code</Label>
+              <Input
+                id="edit-zip"
+                value={editZipCode}
+                onChange={(e) => setEditZipCode(e.target.value)}
+                maxLength={5}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Location Name (Optional)</Label>
+              <Input
+                id="edit-name"
+                value={editLocationName}
+                onChange={(e) => setEditLocationName(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingLocation(null)}>
+              Cancel
+            </Button>
+            <Button onClick={saveEditedLocation} disabled={!editAddress.trim() || !editZipCode.trim()}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
