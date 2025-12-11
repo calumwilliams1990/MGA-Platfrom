@@ -85,8 +85,11 @@ export default function NewQuote() {
   const [quoteData, setQuoteData] = useState<QuoteData>(initialQuoteData);
   const [saving, setSaving] = useState(false);
 
-  const updateQuoteData = (updates: Partial<QuoteData>) => {
-    setQuoteData((prev) => ({ ...prev, ...updates }));
+  const updateQuoteData = (updates: Partial<QuoteData> | ((prev: QuoteData) => Partial<QuoteData>)) => {
+    setQuoteData((prev) => {
+      const newUpdates = typeof updates === 'function' ? updates(prev) : updates;
+      return { ...prev, ...newUpdates };
+    });
   };
 
   // Calculate premium based on rating factors
