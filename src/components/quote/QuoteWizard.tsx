@@ -13,7 +13,7 @@ interface QuoteWizardProps {
   currentStep: number;
   setCurrentStep: (step: number) => void;
   quoteData: QuoteData;
-  updateQuoteData: (updates: Partial<QuoteData>) => void;
+  updateQuoteData: (updates: Partial<QuoteData> | ((prev: QuoteData) => Partial<QuoteData>)) => void;
   referralStatus: { required: boolean; reasons: string[] };
 }
 
