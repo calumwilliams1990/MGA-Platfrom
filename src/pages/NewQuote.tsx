@@ -165,12 +165,19 @@ export default function NewQuote() {
       reasons.push("Occupancy type requires underwriter review");
     }
 
-    // Check for referred locations
-    const referredLocations = quoteData.locations.filter(
-      (loc) => loc.status === "referred"
+    // Check for referred locations (Grade A, D, or E ZIPs)
+    const gradeAReferrals = quoteData.locations.filter(
+      (loc) => loc.riskGrade === "A"
     );
-    if (referredLocations.length > 0) {
-      reasons.push(`${referredLocations.length} location(s) require review`);
+    const highRiskReferrals = quoteData.locations.filter(
+      (loc) => loc.riskGrade === "D" || loc.riskGrade === "E"
+    );
+
+    if (gradeAReferrals.length > 0) {
+      reasons.push(`${gradeAReferrals.length} location(s) in Grade A ZIP (high terror risk)`);
+    }
+    if (highRiskReferrals.length > 0) {
+      reasons.push(`${highRiskReferrals.length} location(s) in Grade D/E ZIP require review`);
     }
 
     // Check manual referral
