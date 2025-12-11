@@ -20,8 +20,8 @@ interface QuoteWizardProps {
 const steps = [
   { id: 1, title: "Documentation", optional: true },
   { id: 2, title: "Policyholder" },
-  { id: 3, title: "Coverage Details" },
-  { id: 4, title: "Locations" },
+  { id: 3, title: "Locations" },
+  { id: 4, title: "Coverage Details" },
   { id: 5, title: "Underwriting" },
   { id: 6, title: "Review" },
 ];
@@ -67,7 +67,7 @@ export function QuoteWizard({
         );
       case 3:
         return (
-          <StepCoverage
+          <StepLocations
             quoteData={quoteData}
             updateQuoteData={updateQuoteData}
             onNext={goToNextStep}
@@ -76,7 +76,7 @@ export function QuoteWizard({
         );
       case 4:
         return (
-          <StepLocations
+          <StepCoverage
             quoteData={quoteData}
             updateQuoteData={updateQuoteData}
             onNext={goToNextStep}
