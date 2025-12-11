@@ -45,7 +45,7 @@ import { ZipRiskGradeImport } from "../ZipRiskGradeImport";
 
 interface StepLocationsProps {
   quoteData: QuoteData;
-  updateQuoteData: (updates: Partial<QuoteData>) => void;
+  updateQuoteData: (updates: Partial<QuoteData> | ((prev: QuoteData) => Partial<QuoteData>)) => void;
   onNext: () => void;
   onBack: () => void;
 }
@@ -214,13 +214,13 @@ export function StepLocations({
       status,
     };
 
-    // Use the editingLocation.id to find and replace the correct location
+    // Use functional update to get latest locations state
     const locationId = editingLocation.id;
-    updateQuoteData({
-      locations: quoteData.locations.map((loc) =>
+    updateQuoteData((prev) => ({
+      locations: prev.locations.map((loc) =>
         loc.id === locationId ? updatedLocation : loc
       ),
-    });
+    }));
 
     // Update cache with fresh data
     setZipRiskCache((prev) => ({ ...prev, [zip]: riskInfo }));
