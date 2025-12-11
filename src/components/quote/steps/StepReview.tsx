@@ -15,7 +15,7 @@ import { useDropzone } from "react-dropzone";
 
 interface StepReviewProps {
   quoteData: QuoteData;
-  updateQuoteData: (updates: Partial<QuoteData>) => void;
+  updateQuoteData: (updates: Partial<QuoteData> | ((prev: QuoteData) => Partial<QuoteData>)) => void;
   onBack: () => void;
   referralStatus: { required: boolean; reasons: string[] };
 }

@@ -11,7 +11,7 @@ import {
 
 interface StepDocumentationProps {
   quoteData: QuoteData;
-  updateQuoteData: (updates: Partial<QuoteData>) => void;
+  updateQuoteData: (updates: Partial<QuoteData> | ((prev: QuoteData) => Partial<QuoteData>)) => void;
   onNext: () => void;
   onSkip: () => void;
 }
