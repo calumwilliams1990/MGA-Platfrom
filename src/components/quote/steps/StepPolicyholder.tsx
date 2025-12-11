@@ -124,13 +124,13 @@ export function StepPolicyholder({
 
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Label>Occupancy Type</Label>
+            <Label>Business Type</Label>
             <Tooltip>
               <TooltipTrigger>
                 <Info className="h-3.5 w-3.5 text-muted-foreground" />
               </TooltipTrigger>
               <TooltipContent>
-                <p>Primary use of the insured property</p>
+                <p>Primary type of the insured business</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -139,7 +139,7 @@ export function StepPolicyholder({
             onValueChange={(value) => updateQuoteData({ occupancyType: value })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select occupancy type" />
+              <SelectValue placeholder="Select business type" />
             </SelectTrigger>
             <SelectContent>
               {occupancyTypes.map((type) => (
@@ -157,7 +157,7 @@ export function StepPolicyholder({
           {selectedOccupancy?.referral && (
             <p className="text-xs text-insurance-referred flex items-center gap-1">
               <AlertTriangle className="h-3 w-3" />
-              This occupancy type will require underwriter review
+              This business type will require underwriter review
             </p>
           )}
         </div>
