@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Info, ChevronLeft, Plus, Search, MoreVertical, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 interface StepLocationsProps {
   quoteData: QuoteData;
@@ -41,14 +42,13 @@ interface StepLocationsProps {
   onBack: () => void;
 }
 
-// Mock ZIP code data for demo
-const zipRiskGrades: Record<string, { grade: "A" | "B" | "C" | "D" | "E"; state: string; county: string }> = {
-  "10001": { grade: "A", state: "NY", county: "New York" },
-  "10010": { grade: "A", state: "NY", county: "New York" },
-  "90210": { grade: "B", state: "CA", county: "Los Angeles" },
-  "77598": { grade: "B", state: "TX", county: "Harris" },
-  "33101": { grade: "C", state: "FL", county: "Miami-Dade" },
-};
+type RiskGrade = "A" | "B" | "C" | "D" | "E";
+
+interface ZipRiskData {
+  risk_grade: RiskGrade;
+  state: string | null;
+  county: string | null;
+}
 
 const statusConfig = {
   accepted: { label: "Accepted", className: "bg-success text-success-foreground" },
@@ -69,19 +69,47 @@ export function StepLocations({
   const [newLocationName, setNewLocationName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [zipRiskCache, setZipRiskCache] = useState<Record<string, ZipRiskData>>({});
 
-  const addLocation = () => {
+  // Fetch ZIP risk grade from database
+  const fetchZipRiskGrade = async (zip: string): Promise<ZipRiskData> => {
+    // Check cache first
+    if (zipRiskCache[zip]) {
+      return zipRiskCache[zip];
+    }
+
+    const { data, error } = await supabase
+      .from("zip_risk_grades")
+      .select("risk_grade, state, county")
+      .eq("zip_code", zip)
+      .maybeSingle();
+
+    if (error || !data) {
+      // Return default if not found
+      return { risk_grade: "C", state: null, county: null };
+    }
+
+    const riskData: ZipRiskData = {
+      risk_grade: data.risk_grade as RiskGrade,
+      state: data.state,
+      county: data.county,
+    };
+
+    // Cache the result
+    setZipRiskCache((prev) => ({ ...prev, [zip]: riskData }));
+    return riskData;
+  };
+
+  const addLocation = async () => {
     if (!newStreetAddress.trim() || !newZipCode.trim()) return;
 
     const zip = newZipCode.trim();
     
-    const riskInfo = zipRiskGrades[zip] || { grade: "C" as const, state: "Unknown", county: "Unknown" };
+    const riskInfo = await fetchZipRiskGrade(zip);
     
     // Determine status based on risk grade
     let status: Location["status"] = "accepted";
-    if (riskInfo.grade === "A") {
-      status = Math.random() > 0.3 ? "accepted" : "referred";
-    } else if (riskInfo.grade === "D" || riskInfo.grade === "E") {
+    if (riskInfo.risk_grade === "D" || riskInfo.risk_grade === "E") {
       status = "referred";
     }
 
@@ -90,9 +118,9 @@ export function StepLocations({
       address: newStreetAddress.trim(),
       name: newLocationName || undefined,
       zipCode: zip,
-      state: riskInfo.state,
-      county: riskInfo.county,
-      riskGrade: riskInfo.grade,
+      state: riskInfo.state || "Unknown",
+      county: riskInfo.county || "Unknown",
+      riskGrade: riskInfo.risk_grade,
       type: "Commercial",
       status,
       propertyValue: 500000,
