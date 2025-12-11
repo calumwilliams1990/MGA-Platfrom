@@ -34,6 +34,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { ZipRiskGradeImport } from "../ZipRiskGradeImport";
 
 interface StepLocationsProps {
   quoteData: QuoteData;
@@ -241,14 +242,12 @@ export function StepLocations({
         </TabsContent>
 
         <TabsContent value="excel" className="space-y-4">
-          <div className="border-2 border-dashed rounded-xl p-8 text-center">
-            <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-            <p className="font-medium mb-1">Upload Excel File</p>
-            <p className="text-sm text-muted-foreground mb-4">
-              Drag and drop or click to upload a .xlsx or .csv file
-            </p>
-            <Button variant="outline">Browse Files</Button>
-          </div>
+          <ZipRiskGradeImport 
+            onImportComplete={() => {
+              // Clear the cache so new lookups fetch fresh data
+              setZipRiskCache({});
+            }} 
+          />
         </TabsContent>
       </Tabs>
 
