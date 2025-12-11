@@ -64,17 +64,16 @@ export function StepLocations({
   onBack,
 }: StepLocationsProps) {
   const [activeTab, setActiveTab] = useState<"manual" | "excel">("manual");
-  const [newAddress, setNewAddress] = useState("");
+  const [newStreetAddress, setNewStreetAddress] = useState("");
+  const [newZipCode, setNewZipCode] = useState("");
   const [newLocationName, setNewLocationName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const addLocation = () => {
-    if (!newAddress.trim()) return;
+    if (!newStreetAddress.trim() || !newZipCode.trim()) return;
 
-    // Extract ZIP from address (simplified)
-    const zipMatch = newAddress.match(/\d{5}/);
-    const zip = zipMatch ? zipMatch[0] : "";
+    const zip = newZipCode.trim();
     
     const riskInfo = zipRiskGrades[zip] || { grade: "C" as const, state: "Unknown", county: "Unknown" };
     
@@ -88,7 +87,7 @@ export function StepLocations({
 
     const newLocation: Location = {
       id: Date.now().toString(),
-      address: newAddress,
+      address: newStreetAddress.trim(),
       name: newLocationName || undefined,
       zipCode: zip,
       state: riskInfo.state,
@@ -101,7 +100,8 @@ export function StepLocations({
     };
 
     updateQuoteData({ locations: [...quoteData.locations, newLocation] });
-    setNewAddress("");
+    setNewStreetAddress("");
+    setNewZipCode("");
     setNewLocationName("");
   };
 
@@ -141,24 +141,44 @@ export function StepLocations({
         </TabsList>
 
         <TabsContent value="manual" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label htmlFor="address">Full Address</Label>
+                <Label htmlFor="streetAddress">Street Address</Label>
                 <Tooltip>
                   <TooltipTrigger>
                     <Info className="h-3.5 w-3.5 text-muted-foreground" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Include ZIP code for accurate risk grading</p>
+                    <p>Street address for the policy document</p>
                   </TooltipContent>
                 </Tooltip>
               </div>
               <Input
-                id="address"
-                placeholder="34, Down Street, NY 10010, USA"
-                value={newAddress}
-                onChange={(e) => setNewAddress(e.target.value)}
+                id="streetAddress"
+                placeholder="34 Down Street, New York, NY"
+                value={newStreetAddress}
+                onChange={(e) => setNewStreetAddress(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="zipCode">ZIP Code</Label>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>ZIP code for risk grading</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Input
+                id="zipCode"
+                placeholder="10010"
+                value={newZipCode}
+                onChange={(e) => setNewZipCode(e.target.value)}
+                maxLength={5}
               />
             </div>
             <div className="space-y-2">
@@ -175,7 +195,7 @@ export function StepLocations({
               </div>
               <Input
                 id="locationName"
-                placeholder="Factory"
+                placeholder="Head Office"
                 value={newLocationName}
                 onChange={(e) => setNewLocationName(e.target.value)}
               />
@@ -185,7 +205,7 @@ export function StepLocations({
             variant="outline"
             className="w-full gap-2"
             onClick={addLocation}
-            disabled={!newAddress.trim()}
+            disabled={!newStreetAddress.trim() || !newZipCode.trim()}
           >
             <Plus className="h-4 w-4" />
             Add Location
