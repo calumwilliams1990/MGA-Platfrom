@@ -20,7 +20,7 @@ interface QuoteWizardProps {
 const steps = [
   { id: 1, title: "Documentation", optional: true },
   { id: 2, title: "Policyholder" },
-  { id: 3, title: "Coverage" },
+  { id: 3, title: "Coverage Details" },
   { id: 4, title: "Locations" },
   { id: 5, title: "Underwriting" },
   { id: 6, title: "Review" },
