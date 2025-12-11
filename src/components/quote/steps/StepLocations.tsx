@@ -71,6 +71,27 @@ export function StepLocations({
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [zipRiskCache, setZipRiskCache] = useState<Record<string, ZipRiskData>>({});
+  const [zipLookupResult, setZipLookupResult] = useState<ZipRiskData | null>(null);
+  const [isLookingUpZip, setIsLookingUpZip] = useState(false);
+
+  // Lookup ZIP risk grade when ZIP code changes
+  useEffect(() => {
+    const lookupZip = async () => {
+      const zip = newZipCode.trim();
+      if (zip.length !== 5) {
+        setZipLookupResult(null);
+        return;
+      }
+
+      setIsLookingUpZip(true);
+      const riskData = await fetchZipRiskGrade(zip);
+      setZipLookupResult(riskData);
+      setIsLookingUpZip(false);
+    };
+
+    const debounce = setTimeout(lookupZip, 300);
+    return () => clearTimeout(debounce);
+  }, [newZipCode]);
 
   // Fetch ZIP risk grade from database
   const fetchZipRiskGrade = async (zip: string): Promise<ZipRiskData> => {
@@ -108,9 +129,9 @@ export function StepLocations({
     
     const riskInfo = await fetchZipRiskGrade(zip);
     
-    // Determine status based on risk grade
+    // Determine status based on risk grade - A, D, E are referral grades
     let status: Location["status"] = "accepted";
-    if (riskInfo.risk_grade === "D" || riskInfo.risk_grade === "E") {
+    if (riskInfo.risk_grade === "A" || riskInfo.risk_grade === "D" || riskInfo.risk_grade === "E") {
       status = "referred";
     }
 
@@ -230,6 +251,44 @@ export function StepLocations({
               />
             </div>
           </div>
+
+          {/* Risk Grade Lookup Display */}
+          {newZipCode.trim().length === 5 && (
+            <div className={cn(
+              "p-4 rounded-lg border",
+              isLookingUpZip ? "bg-muted/50 border-muted" :
+              zipLookupResult?.risk_grade === "A" ? "bg-insurance-referred/10 border-insurance-referred" :
+              zipLookupResult?.risk_grade === "D" || zipLookupResult?.risk_grade === "E" ? "bg-insurance-referred/10 border-insurance-referred" :
+              "bg-success/10 border-success"
+            )}>
+              {isLookingUpZip ? (
+                <p className="text-sm text-muted-foreground">Looking up ZIP code...</p>
+              ) : zipLookupResult ? (
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">Risk Grade: {zipLookupResult.risk_grade}</span>
+                      {(zipLookupResult.risk_grade === "A" || zipLookupResult.risk_grade === "D" || zipLookupResult.risk_grade === "E") && (
+                        <Badge className="bg-insurance-referred text-white">Referral ZIP</Badge>
+                      )}
+                    </div>
+                    {(zipLookupResult.county || zipLookupResult.state) && (
+                      <p className="text-sm text-muted-foreground">
+                        {[zipLookupResult.county, zipLookupResult.state].filter(Boolean).join(", ")}
+                      </p>
+                    )}
+                  </div>
+                  {zipLookupResult.risk_grade === "A" && (
+                    <p className="text-sm text-insurance-referred font-medium">
+                      Grade A requires underwriter review
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">ZIP code not found in database</p>
+              )}
+            </div>
+          )}
           <Button
             variant="outline"
             className="w-full gap-2"
