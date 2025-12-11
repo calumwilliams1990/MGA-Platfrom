@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { occupancyTypes } from "@/components/quote/steps/StepPolicyholder";
 export interface QuoteData {
   // Step 1 - Documentation
   documents: File[];
@@ -90,8 +91,12 @@ export default function NewQuote() {
 
   // Calculate premium based on rating factors
   const calculatePremium = (): number => {
-    let basePremium = 0;
-    const baseRate = 0.0005; // 0.05% base rate
+    // Get base rate from occupancy type (rates are in %)
+    const selectedOccupancy = occupancyTypes.find(
+      (o) => o.value === quoteData.occupancyType
+    );
+    const baseRatePercent = selectedOccupancy?.baseRate || 0.05; // Default 0.05%
+    const baseRate = baseRatePercent / 100; // Convert to decimal
 
     // Calculate TIV from locations
     const totalTIV = quoteData.locations.reduce(
@@ -99,37 +104,37 @@ export default function NewQuote() {
       0
     );
 
-    if (totalTIV > 0) {
-      basePremium = totalTIV * baseRate;
-    } else if (quoteData.annualRevenue > 0) {
-      basePremium = quoteData.annualRevenue * baseRate;
+    // Use TIV if available, otherwise use policy limit
+    let exposureBase = totalTIV;
+    if (exposureBase === 0) {
+      exposureBase = quoteData.policyLimit || 0;
     }
 
-    // Occupancy type load
-    const occupancyLoads: Record<string, number> = {
-      office: 1.0,
-      retail: 1.2,
-      manufacturing: 1.1,
-      warehouse: 0.9,
-      hospitality: 1.15,
-      healthcare: 1.1,
-      construction: 0.8,
-      education: 1.0,
-    };
-    const occupancyLoad = occupancyLoads[quoteData.occupancyType.toLowerCase()] || 1.0;
+    // Base premium = exposure * rate
+    let basePremium = exposureBase * baseRate;
 
-    // Location count load
+    // Location count adjustment from rater (sliding scale)
     const locationCount = quoteData.locations.length;
-    let locationLoad = 1.0;
-    if (locationCount > 1) {
-      locationLoad = 1 + Math.min(locationCount * 0.01, 0.3);
+    let locationAdjustment = 0;
+    if (locationCount >= 2 && locationCount <= 10) {
+      locationAdjustment = 0.05; // 5%
+    } else if (locationCount >= 11 && locationCount <= 50) {
+      locationAdjustment = 0.15; // 15%
+    } else if (locationCount > 50) {
+      locationAdjustment = 0.20; // 20%
     }
+    const locationLoad = 1 + locationAdjustment;
 
-    // Prior losses load
+    // Prior losses load (25% for yes per rater)
     const lossLoad = quoteData.priorLosses ? 1.25 : 1.0;
 
     // Calculate final premium
-    const finalPremium = basePremium * occupancyLoad * locationLoad * lossLoad;
+    const finalPremium = basePremium * locationLoad * lossLoad;
+
+    // Ensure minimum premium of $500 if there's any exposure
+    if (exposureBase > 0 && finalPremium < 500) {
+      return 500;
+    }
 
     return Math.round(finalPremium);
   };
