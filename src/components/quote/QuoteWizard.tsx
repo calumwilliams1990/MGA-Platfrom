@@ -21,8 +21,8 @@ const steps = [
   { id: 1, title: "Documentation", optional: true },
   { id: 2, title: "Policyholder" },
   { id: 3, title: "Locations" },
-  { id: 4, title: "Coverage Details" },
-  { id: 5, title: "Underwriting" },
+  { id: 4, title: "Underwriting" },
+  { id: 5, title: "Coverage Details" },
   { id: 6, title: "Review" },
 ];
 
@@ -76,7 +76,7 @@ export function QuoteWizard({
         );
       case 4:
         return (
-          <StepCoverage
+          <StepUnderwriting
             quoteData={quoteData}
             updateQuoteData={updateQuoteData}
             onNext={goToNextStep}
@@ -85,7 +85,7 @@ export function QuoteWizard({
         );
       case 5:
         return (
-          <StepUnderwriting
+          <StepCoverage
             quoteData={quoteData}
             updateQuoteData={updateQuoteData}
             onNext={goToNextStep}
