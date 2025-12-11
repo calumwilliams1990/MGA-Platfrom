@@ -185,9 +185,19 @@ export function StepLocations({
     if (!editingLocation || !editAddress.trim() || !editZipCode.trim()) return;
 
     const zip = editZipCode.trim();
-    const riskInfo = await fetchZipRiskGrade(zip);
+    
+    // Force fresh lookup by bypassing cache for edited locations
+    const { data, error } = await supabase
+      .from("zip_risk_grades")
+      .select("risk_grade, state, county")
+      .eq("zip_code", zip)
+      .maybeSingle();
 
-    // Determine status based on risk grade
+    const riskInfo: ZipRiskData = data 
+      ? { risk_grade: data.risk_grade as RiskGrade, state: data.state, county: data.county }
+      : { risk_grade: "C", state: null, county: null };
+
+    // Determine status based on risk grade - A, D, E are referral grades
     let status: Location["status"] = "accepted";
     if (riskInfo.risk_grade === "A" || riskInfo.risk_grade === "D" || riskInfo.risk_grade === "E") {
       status = "referred";
@@ -204,12 +214,16 @@ export function StepLocations({
       status,
     };
 
+    // Use the editingLocation.id to find and replace the correct location
+    const locationId = editingLocation.id;
     updateQuoteData({
       locations: quoteData.locations.map((loc) =>
-        loc.id === editingLocation.id ? updatedLocation : loc
+        loc.id === locationId ? updatedLocation : loc
       ),
     });
 
+    // Update cache with fresh data
+    setZipRiskCache((prev) => ({ ...prev, [zip]: riskInfo }));
     setEditingLocation(null);
   };
 
