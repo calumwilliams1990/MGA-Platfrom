@@ -136,9 +136,9 @@ export function StepLocations({
     
     const riskInfo = await fetchZipRiskGrade(zip);
     
-    // Determine status based on risk grade - A, D, E are referral grades
+    // Determine status based on risk grade - only A is a referral grade
     let status: Location["status"] = "accepted";
-    if (riskInfo.risk_grade === "A" || riskInfo.risk_grade === "D" || riskInfo.risk_grade === "E") {
+    if (riskInfo.risk_grade === "A") {
       status = "referred";
     }
 
@@ -197,9 +197,9 @@ export function StepLocations({
       ? { risk_grade: data.risk_grade as RiskGrade, state: data.state, county: data.county }
       : { risk_grade: "C", state: null, county: null };
 
-    // Determine status based on risk grade - A, D, E are referral grades
+    // Determine status based on risk grade - only A is a referral grade
     let status: Location["status"] = "accepted";
-    if (riskInfo.risk_grade === "A" || riskInfo.risk_grade === "D" || riskInfo.risk_grade === "E") {
+    if (riskInfo.risk_grade === "A") {
       status = "referred";
     }
 
@@ -324,7 +324,6 @@ export function StepLocations({
               "p-4 rounded-lg border",
               isLookingUpZip ? "bg-muted/50 border-muted" :
               zipLookupResult?.risk_grade === "A" ? "bg-insurance-referred/10 border-insurance-referred" :
-              zipLookupResult?.risk_grade === "D" || zipLookupResult?.risk_grade === "E" ? "bg-insurance-referred/10 border-insurance-referred" :
               "bg-success/10 border-success"
             )}>
               {isLookingUpZip ? (
@@ -334,7 +333,7 @@ export function StepLocations({
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold">Risk Grade: {zipLookupResult.risk_grade}</span>
-                      {(zipLookupResult.risk_grade === "A" || zipLookupResult.risk_grade === "D" || zipLookupResult.risk_grade === "E") && (
+                      {zipLookupResult.risk_grade === "A" && (
                         <Badge className="bg-insurance-referred text-white">Referral ZIP</Badge>
                       )}
                     </div>
