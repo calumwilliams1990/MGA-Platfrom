@@ -275,8 +275,8 @@ export default function NewQuote() {
                 { id: 1, title: "Documentation" },
                 { id: 2, title: "Policyholder" },
                 { id: 3, title: "Locations" },
-                { id: 4, title: "Coverage Details" },
-                { id: 5, title: "Underwriting" },
+                { id: 4, title: "Underwriting" },
+                { id: 5, title: "Coverage Details" },
                 { id: 6, title: "Review" },
               ].map((step, index) => {
                 const isCompleted = step.id < currentStep;
