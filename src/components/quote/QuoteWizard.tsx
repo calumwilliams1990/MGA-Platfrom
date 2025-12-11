@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import { QuoteData, Location } from "@/pages/NewQuote";
 import { StepDocumentation } from "./steps/StepDocumentation";
 import { StepPolicyholder } from "./steps/StepPolicyholder";
-import { StepBusinessInfo } from "./steps/StepBusinessInfo";
 import { StepCoverage } from "./steps/StepCoverage";
 import { StepLocations } from "./steps/StepLocations";
 import { StepUnderwriting } from "./steps/StepUnderwriting";
@@ -21,11 +20,10 @@ interface QuoteWizardProps {
 const steps = [
   { id: 1, title: "Documentation", optional: true },
   { id: 2, title: "Policyholder" },
-  { id: 3, title: "Business Info" },
-  { id: 4, title: "Coverage" },
-  { id: 5, title: "Locations" },
-  { id: 6, title: "Underwriting" },
-  { id: 7, title: "Review" },
+  { id: 3, title: "Coverage" },
+  { id: 4, title: "Locations" },
+  { id: 5, title: "Underwriting" },
+  { id: 6, title: "Review" },
 ];
 
 export function QuoteWizard({
@@ -69,7 +67,7 @@ export function QuoteWizard({
         );
       case 3:
         return (
-          <StepBusinessInfo
+          <StepCoverage
             quoteData={quoteData}
             updateQuoteData={updateQuoteData}
             onNext={goToNextStep}
@@ -78,7 +76,7 @@ export function QuoteWizard({
         );
       case 4:
         return (
-          <StepCoverage
+          <StepLocations
             quoteData={quoteData}
             updateQuoteData={updateQuoteData}
             onNext={goToNextStep}
@@ -87,15 +85,6 @@ export function QuoteWizard({
         );
       case 5:
         return (
-          <StepLocations
-            quoteData={quoteData}
-            updateQuoteData={updateQuoteData}
-            onNext={goToNextStep}
-            onBack={goToPreviousStep}
-          />
-        );
-      case 6:
-        return (
           <StepUnderwriting
             quoteData={quoteData}
             updateQuoteData={updateQuoteData}
@@ -103,7 +92,7 @@ export function QuoteWizard({
             onBack={goToPreviousStep}
           />
         );
-      case 7:
+      case 6:
         return (
           <StepReview
             quoteData={quoteData}
