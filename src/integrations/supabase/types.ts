@@ -89,6 +89,33 @@ export type Database = {
         }
         Relationships: []
       }
+      zip_risk_grades: {
+        Row: {
+          county: string | null
+          created_at: string
+          id: string
+          risk_grade: string
+          state: string | null
+          zip_code: string
+        }
+        Insert: {
+          county?: string | null
+          created_at?: string
+          id?: string
+          risk_grade: string
+          state?: string | null
+          zip_code: string
+        }
+        Update: {
+          county?: string | null
+          created_at?: string
+          id?: string
+          risk_grade?: string
+          state?: string | null
+          zip_code?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
