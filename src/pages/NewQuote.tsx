@@ -262,10 +262,10 @@ export default function NewQuote() {
           {/* Progress Bar */}
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-sidebar-foreground/70">Step {currentStep} of 7</span>
-              <span className="text-sm font-medium text-sidebar-foreground">{Math.round((currentStep / 7) * 100)}%</span>
+              <span className="text-sm text-sidebar-foreground/70">Step {currentStep} of 6</span>
+              <span className="text-sm font-medium text-sidebar-foreground">{Math.round((currentStep / 6) * 100)}%</span>
             </div>
-            <Progress value={(currentStep / 7) * 100} className="h-2" />
+            <Progress value={(currentStep / 6) * 100} className="h-2" />
           </div>
 
           {/* Horizontal Step Progress */}
@@ -274,11 +274,10 @@ export default function NewQuote() {
               {[
                 { id: 1, title: "Documentation" },
                 { id: 2, title: "Policyholder" },
-                { id: 3, title: "Business Info" },
-                { id: 4, title: "Coverage" },
-                { id: 5, title: "Locations" },
-                { id: 6, title: "Underwriting" },
-                { id: 7, title: "Review" },
+                { id: 3, title: "Coverage Details" },
+                { id: 4, title: "Locations" },
+                { id: 5, title: "Underwriting" },
+                { id: 6, title: "Review" },
               ].map((step, index) => {
                 const isCompleted = step.id < currentStep;
                 const isCurrent = step.id === currentStep;
@@ -309,7 +308,7 @@ export default function NewQuote() {
                         {step.title}
                       </span>
                     </button>
-                    {index < 6 && (
+                    {index < 5 && (
                       <div
                         className={cn(
                           "flex-1 h-0.5 mx-2 transition-colors",
