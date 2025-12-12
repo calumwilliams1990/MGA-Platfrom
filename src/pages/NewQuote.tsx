@@ -33,6 +33,7 @@ export interface QuoteData {
   
   // Step 6 - Underwriting
   priorLosses: boolean;
+  priorLossAmount: number;
   priorLossDetails: string;
   priorLossDocuments: File[];
   numberOfEmployees: string;
@@ -69,6 +70,7 @@ const initialQuoteData: QuoteData = {
   expiryDate: "",
   locations: [],
   priorLosses: false,
+  priorLossAmount: 0,
   priorLossDetails: "",
   priorLossDocuments: [],
   numberOfEmployees: "0-100",
@@ -114,6 +116,7 @@ export default function NewQuote() {
             expiryDate: data.expiry_date || "",
             locations: (data.locations as unknown as Location[]) || [],
             priorLosses: data.prior_losses || false,
+            priorLossAmount: (data as any).prior_loss_amount || 0,
             priorLossDetails: data.prior_loss_details || "",
             priorLossDocuments: [],
             numberOfEmployees: data.number_of_employees || "0-100",
@@ -181,11 +184,21 @@ export default function NewQuote() {
     }
     const locationLoad = 1 + locationAdjustment;
 
-    // Prior losses load (25% for yes per rater)
-    const lossLoad = quoteData.priorLosses ? 1.25 : 1.0;
+    // Prior losses load
+    let lossLoad = 1.0;
+    if (quoteData.priorLosses) {
+      lossLoad = 1.25; // Default 25% load for prior losses
+    }
 
-    // Calculate final premium
-    const finalPremium = basePremium * locationLoad * lossLoad;
+    // Calculate intermediate premium before loss amount adjustment
+    let finalPremium = basePremium * locationLoad * lossLoad;
+
+    // Special rule: losses under $10,000 apply minimum 50% load or $5,000 (whichever is higher)
+    if (quoteData.priorLosses && quoteData.priorLossAmount > 0 && quoteData.priorLossAmount < 10000) {
+      const fiftyPercentLoad = finalPremium * 0.5;
+      const lossLoadAmount = Math.max(fiftyPercentLoad, 5000);
+      finalPremium += lossLoadAmount;
+    }
 
     // Ensure minimum premium of $500 if there's any exposure
     if (exposureBase > 0 && finalPremium < 500) {
