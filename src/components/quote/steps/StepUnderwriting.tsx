@@ -92,6 +92,51 @@ export function StepUnderwriting({
       </p>
 
       <div className="space-y-6">
+        {/* Number of Employees */}
+        <div className="space-y-2">
+          <Label>Number of Employees</Label>
+          <Select
+            value={quoteData.numberOfEmployees}
+            onValueChange={(value) =>
+              updateQuoteData({ numberOfEmployees: value })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select range" />
+            </SelectTrigger>
+            <SelectContent>
+              {employeeRanges.map((range) => (
+                <SelectItem key={range.value} value={range.value}>
+                  {range.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Annual Revenue */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Label htmlFor="revenue">Annual Total Revenue</Label>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-3.5 w-3.5 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Total annual revenue of the insured entity</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <Input
+            id="revenue"
+            placeholder="$0"
+            value={quoteData.annualRevenue ? formatCurrency(quoteData.annualRevenue) : ""}
+            onChange={(e) =>
+              updateQuoteData({ annualRevenue: parseCurrency(e.target.value) })
+            }
+          />
+        </div>
+
         {/* Prior Losses */}
         <div className="space-y-3">
           <Label>Prior Terrorism-Related Losses?</Label>
@@ -206,51 +251,6 @@ export function StepUnderwriting({
               </div>
             </div>
           )}
-        </div>
-
-        {/* Number of Employees */}
-        <div className="space-y-2">
-          <Label>Number of Employees</Label>
-          <Select
-            value={quoteData.numberOfEmployees}
-            onValueChange={(value) =>
-              updateQuoteData({ numberOfEmployees: value })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select range" />
-            </SelectTrigger>
-            <SelectContent>
-              {employeeRanges.map((range) => (
-                <SelectItem key={range.value} value={range.value}>
-                  {range.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Annual Revenue */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="revenue">Annual Total Revenue</Label>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info className="h-3.5 w-3.5 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Total annual revenue of the insured entity</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-          <Input
-            id="revenue"
-            placeholder="$0"
-            value={quoteData.annualRevenue ? formatCurrency(quoteData.annualRevenue) : ""}
-            onChange={(e) =>
-              updateQuoteData({ annualRevenue: parseCurrency(e.target.value) })
-            }
-          />
         </div>
       </div>
 
