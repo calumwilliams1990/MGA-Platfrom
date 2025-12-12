@@ -31,6 +31,7 @@ export type Database = {
           number_of_employees: string | null
           occupancy_type: string | null
           policy_limit: number | null
+          prior_loss_amount: number | null
           prior_loss_details: string | null
           prior_losses: boolean | null
           referral_reason: string | null
@@ -55,6 +56,7 @@ export type Database = {
           number_of_employees?: string | null
           occupancy_type?: string | null
           policy_limit?: number | null
+          prior_loss_amount?: number | null
           prior_loss_details?: string | null
           prior_losses?: boolean | null
           referral_reason?: string | null
@@ -79,6 +81,7 @@ export type Database = {
           number_of_employees?: string | null
           occupancy_type?: string | null
           policy_limit?: number | null
+          prior_loss_amount?: number | null
           prior_loss_details?: string | null
           prior_losses?: boolean | null
           referral_reason?: string | null
