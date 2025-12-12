@@ -121,6 +121,34 @@ export function StepUnderwriting({
               <p className="text-xs text-insurance-referred">
                 This will refer to an underwriter for further review. Please ensure this is only for perils covered under this policy and provide as much additional information as possible.
               </p>
+
+              {/* Prior Loss Amount */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="priorLossAmount">Loss Amount</Label>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Total value of all prior terrorism-related losses</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <Input
+                  id="priorLossAmount"
+                  placeholder="$0"
+                  value={quoteData.priorLossAmount ? formatCurrency(quoteData.priorLossAmount) : ""}
+                  onChange={(e) =>
+                    updateQuoteData({ priorLossAmount: parseCurrency(e.target.value) })
+                  }
+                />
+                {quoteData.priorLossAmount !== undefined && quoteData.priorLossAmount > 0 && quoteData.priorLossAmount < 10000 && (
+                  <p className="text-xs text-muted-foreground">
+                    Losses under $10,000 will apply a minimum 50% or $5,000 premium load (whichever is higher)
+                  </p>
+                )}
+              </div>
               
               {/* Prior Loss Details */}
               <div className="space-y-2">
