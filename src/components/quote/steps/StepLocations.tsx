@@ -65,6 +65,20 @@ const statusConfig = {
   missing: { label: "Missing", className: "bg-warning text-warning-foreground" },
 };
 
+// Derive effective status based on current business rules
+// Only Grade A ZIPs should show as "Referral" unless explicitly declined/missing
+const getEffectiveStatus = (location: Location): Location["status"] => {
+  if (location.status === "declined" || location.status === "missing") {
+    return location.status;
+  }
+
+  if (location.riskGrade === "A") {
+    return "referred";
+  }
+
+  return "accepted";
+};
+
 export function StepLocations({
   quoteData,
   updateQuoteData,
@@ -228,8 +242,9 @@ export function StepLocations({
   };
 
   const filteredLocations = quoteData.locations.filter((loc) => {
+    const effectiveStatus = getEffectiveStatus(loc);
     const matchesSearch = loc.address.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || loc.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || effectiveStatus === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -417,47 +432,53 @@ export function StepLocations({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredLocations.map((location) => (
-                  <TableRow key={location.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium text-sm truncate max-w-xs">
-                          {location.address}
-                        </p>
-                        {location.name && (
-                          <p className="text-xs text-muted-foreground">
-                            {location.name}
+                {filteredLocations.map((location) => {
+                  const effectiveStatus = getEffectiveStatus(location);
+
+                  return (
+                    <TableRow key={location.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium text-sm truncate max-w-xs">
+                            {location.address}
                           </p>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>Grade {location.riskGrade}</TableCell>
-                    <TableCell>{location.type}</TableCell>
-                    <TableCell>
-                      <Badge className={cn("text-xs", statusConfig[location.status].className)}>
-                        {statusConfig[location.status].label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => openEditDialog(location)}>Edit</DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => removeLocation(location.id)}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                          {location.name && (
+                            <p className="text-xs text-muted-foreground">
+                              {location.name}
+                            </p>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>Grade {location.riskGrade}</TableCell>
+                      <TableCell>{location.type}</TableCell>
+                      <TableCell>
+                        <Badge className={cn("text-xs", statusConfig[effectiveStatus].className)}>
+                          {statusConfig[effectiveStatus].label}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => openEditDialog(location)}>
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => removeLocation(location.id)}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>
