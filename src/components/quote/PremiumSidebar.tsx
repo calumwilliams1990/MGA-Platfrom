@@ -1,12 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { ChevronDown, CheckCircle, AlertTriangle } from "lucide-react";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { CheckCircle, AlertTriangle } from "lucide-react";
 
 interface PremiumSidebarProps {
   premium: number;
@@ -17,8 +10,6 @@ interface PremiumSidebarProps {
 }
 
 export function PremiumSidebar({ premium, referralStatus }: PremiumSidebarProps) {
-  const [breakdownOpen, setBreakdownOpen] = useState(false);
-
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -40,43 +31,7 @@ export function PremiumSidebar({ premium, referralStatus }: PremiumSidebarProps)
           {premium > 0 ? "Estimated Annual Premium" : "Enter coverage details to see premium estimate"}
         </p>
 
-        {premium > 0 && (
-          <Collapsible open={breakdownOpen} onOpenChange={setBreakdownOpen}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full text-sm font-medium hover:text-primary transition-colors">
-              View Breakdown
-              <ChevronDown
-                className={cn(
-                  "h-4 w-4 transition-transform",
-                  breakdownOpen && "rotate-180"
-                )}
-              />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="mt-3 space-y-2 text-sm">
-              <div className="flex justify-between text-muted-foreground">
-                <span>Base Premium</span>
-                <span>{formatCurrency(premium * 0.7)}</span>
-              </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Occupancy Load</span>
-                <span>{formatCurrency(premium * 0.15)}</span>
-              </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Location Load</span>
-                <span>{formatCurrency(premium * 0.1)}</span>
-              </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Loss History</span>
-                <span>{formatCurrency(premium * 0.05)}</span>
-              </div>
-              <div className="border-t pt-2 flex justify-between font-medium">
-                <span>Total</span>
-                <span>{formatCurrency(premium)}</span>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        )}
-
-        <p className="text-xs text-muted-foreground mt-4">
+        <p className="text-xs text-muted-foreground">
           Premium updates in real-time as you complete the form
         </p>
       </Card>
