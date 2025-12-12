@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Check, Save } from "lucide-react";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { QuoteWizard } from "@/components/quote/QuoteWizard";
@@ -80,10 +80,63 @@ const initialQuoteData: QuoteData = {
 
 export default function NewQuote() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const policyId = searchParams.get("id");
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [quoteData, setQuoteData] = useState<QuoteData>(initialQuoteData);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(!!policyId);
+
+  // Load existing policy data if editing
+  useEffect(() => {
+    const loadPolicy = async () => {
+      if (!policyId) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from("policies")
+          .select("*")
+          .eq("id", policyId)
+          .maybeSingle();
+
+        if (error) throw error;
+        
+        if (data) {
+          setQuoteData({
+            documents: [],
+            insuredName: data.insured_name || "",
+            mailingAddress: data.mailing_address || "",
+            occupancyType: data.occupancy_type || "",
+            policyLimit: data.policy_limit || 1000000,
+            deductible: data.deductible || 0,
+            inceptionDate: data.inception_date || "",
+            expiryDate: data.expiry_date || "",
+            locations: (data.locations as unknown as Location[]) || [],
+            priorLosses: data.prior_losses || false,
+            priorLossDetails: data.prior_loss_details || "",
+            priorLossDocuments: [],
+            numberOfEmployees: data.number_of_employees || "0-100",
+            annualRevenue: data.annual_revenue || 0,
+            confirmed: data.confirmed || false,
+            manualReferral: data.manual_referral || false,
+            referralReason: data.referral_reason || "",
+          });
+        }
+      } catch (error) {
+        console.error("Error loading policy:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load policy data.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPolicy();
+  }, [policyId, toast]);
 
   const updateQuoteData = (updates: Partial<QuoteData> | ((prev: QuoteData) => Partial<QuoteData>)) => {
     setQuoteData((prev) => {
@@ -194,7 +247,7 @@ export default function NewQuote() {
       const currentReferralStatus = checkReferralStatus();
       const currentPremium = calculatePremium();
 
-      const { error } = await supabase.from("policies").insert([{
+      const policyData = {
         status: "draft",
         insured_name: quoteData.insuredName || null,
         mailing_address: quoteData.mailingAddress || null,
@@ -214,7 +267,22 @@ export default function NewQuote() {
         estimated_premium: currentPremium || null,
         referral_required: currentReferralStatus.required,
         referral_reasons: currentReferralStatus.reasons,
-      }]);
+      };
+
+      let error;
+      
+      if (policyId) {
+        // Update existing policy
+        const result = await supabase
+          .from("policies")
+          .update(policyData)
+          .eq("id", policyId);
+        error = result.error;
+      } else {
+        // Insert new policy
+        const result = await supabase.from("policies").insert([policyData]);
+        error = result.error;
+      }
 
       if (error) throw error;
 
