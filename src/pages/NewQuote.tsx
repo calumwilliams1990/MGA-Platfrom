@@ -270,6 +270,7 @@ export default function NewQuote() {
         inception_date: quoteData.inceptionDate || null,
         expiry_date: quoteData.expiryDate || null,
         prior_losses: quoteData.priorLosses,
+        prior_loss_amount: quoteData.priorLossAmount || null,
         prior_loss_details: quoteData.priorLossDetails || null,
         number_of_employees: quoteData.numberOfEmployees || null,
         annual_revenue: quoteData.annualRevenue || null,
