@@ -143,11 +143,6 @@ export function StepUnderwriting({
                     updateQuoteData({ priorLossAmount: parseCurrency(e.target.value) })
                   }
                 />
-                {quoteData.priorLossAmount !== undefined && quoteData.priorLossAmount > 0 && quoteData.priorLossAmount < 10000 && (
-                  <p className="text-xs text-muted-foreground">
-                    Losses under $10,000 will apply a minimum 50% or $5,000 premium load (whichever is higher)
-                  </p>
-                )}
               </div>
               
               {/* Prior Loss Details */}
