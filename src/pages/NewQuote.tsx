@@ -242,8 +242,32 @@ export default function NewQuote() {
     }
     const revenueLoad = 1 + revenueAdjustment;
 
+    // Calculate period length factor (pro-rate from 12-month base with multi-year discounts)
+    // 0-12 months: 0% discount, 12-24 months: 5%, 24-36 months: 10%, 36-48 months: 20%
+    let periodFactor = 1.0;
+    let periodDiscount = 0;
+    if (quoteData.inceptionDate && quoteData.expiryDate) {
+      const inception = new Date(quoteData.inceptionDate);
+      const expiry = new Date(quoteData.expiryDate);
+      const diffMs = expiry.getTime() - inception.getTime();
+      const periodMonths = diffMs / (1000 * 60 * 60 * 24 * 30.44); // Average days per month
+      
+      // Pro-rate based on period length (12 months = 1.0)
+      periodFactor = periodMonths / 12;
+      
+      // Apply multi-year discount
+      if (periodMonths > 36) {
+        periodDiscount = 0.20;
+      } else if (periodMonths > 24) {
+        periodDiscount = 0.10;
+      } else if (periodMonths > 12) {
+        periodDiscount = 0.05;
+      }
+    }
+    const periodLoad = periodFactor * (1 - periodDiscount);
+
     // Calculate intermediate premium before loss amount adjustment
-    let finalPremium = basePremium * locationLoad * lossLoad * employeeLoad * revenueLoad;
+    let finalPremium = basePremium * locationLoad * lossLoad * employeeLoad * revenueLoad * periodLoad;
 
     // Special rule: losses under $10,000 apply minimum 50% load or $5,000 (whichever is higher)
     if (quoteData.priorLosses && quoteData.priorLossAmount > 0 && quoteData.priorLossAmount < 10000) {
