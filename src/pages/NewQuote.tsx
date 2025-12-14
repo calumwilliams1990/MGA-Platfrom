@@ -154,7 +154,7 @@ export default function NewQuote() {
     const selectedOccupancy = occupancyTypes.find(
       (o) => o.value === quoteData.occupancyType
     );
-    const baseRatePercent = selectedOccupancy?.baseRate || 0.05; // Default 0.05%
+    const baseRatePercent = selectedOccupancy?.baseRate || 0.50; // Default 0.50% for referral types
     const baseRate = baseRatePercent / 100; // Convert to decimal
 
     // Calculate TIV from locations
