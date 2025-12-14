@@ -172,6 +172,18 @@ export default function NewQuote() {
     // Base premium = exposure * rate
     let basePremium = exposureBase * baseRate;
 
+    // Policy limit factor (ILF - Increased Limits Factor)
+    let limitFactor = 1.0;
+    const policyLimit = quoteData.policyLimit || 0;
+    if (policyLimit > 1000000 && policyLimit <= 5000000) {
+      limitFactor = 1.15; // 15% increase for $1M-$5M
+    } else if (policyLimit > 5000000 && policyLimit <= 10000000) {
+      limitFactor = 1.35; // 35% increase for $5M-$10M
+    } else if (policyLimit > 10000000) {
+      limitFactor = 1.50; // 50% increase for $10M+
+    }
+    basePremium = basePremium * limitFactor;
+
     // Location count adjustment from rater (sliding scale)
     const locationCount = quoteData.locations.length;
     let locationAdjustment = 0;
