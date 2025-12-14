@@ -172,16 +172,17 @@ export default function NewQuote() {
     // Base premium = exposure * rate
     let basePremium = exposureBase * baseRate;
 
-    // Policy limit factor (ILF - Increased Limits Factor)
-    let limitFactor = 1.0;
+    // Policy limit factor - DISCOUNT scale from rater (linear interpolation)
+    // $0 = 0% discount, $125M = 10% discount, $250M = 20% discount
     const policyLimit = quoteData.policyLimit || 0;
-    if (policyLimit > 1000000 && policyLimit <= 5000000) {
-      limitFactor = 1.15; // 15% increase for $1M-$5M
-    } else if (policyLimit > 5000000 && policyLimit <= 10000000) {
-      limitFactor = 1.35; // 35% increase for $5M-$10M
-    } else if (policyLimit > 10000000) {
-      limitFactor = 1.50; // 50% increase for $10M+
+    let limitDiscount = 0;
+    if (policyLimit >= 250000000) {
+      limitDiscount = 0.20; // 20% max discount
+    } else if (policyLimit > 0) {
+      // Linear scale: 10% per $125M
+      limitDiscount = (policyLimit / 125000000) * 0.10;
     }
+    const limitFactor = 1 - limitDiscount;
     basePremium = basePremium * limitFactor;
 
     // Location count adjustment from rater (continuous sliding scale)
@@ -202,28 +203,42 @@ export default function NewQuote() {
     // Prior losses load
     let lossLoad = 1.0;
     if (quoteData.priorLosses) {
-      lossLoad = 1.25; // Default 25% load for prior losses
+      lossLoad = 1.25; // 25% load for prior losses
     }
 
-    // Employee count adjustment
-    let employeeAdjustment = 0;
+    // Employee count adjustment from rater
+    // 0-100 = 5%, 100-1000 = 10%, 1000-10000 = 15%, 10000+ = 20%
+    let employeeAdjustment = 0.05; // Default 5% for 0-100
     switch (quoteData.numberOfEmployees) {
+      case "0-100":
+        employeeAdjustment = 0.05;
+        break;
       case "100-1000":
-        employeeAdjustment = 0.10; // 10%
+        employeeAdjustment = 0.10;
         break;
-      case "1000+":
-        employeeAdjustment = 0.20; // 20%
+      case "1000-10000":
+        employeeAdjustment = 0.15;
         break;
-      default: // 0-100
-        employeeAdjustment = 0;
+      case "10000+":
+        employeeAdjustment = 0.20;
+        break;
     }
     const employeeLoad = 1 + employeeAdjustment;
 
-    // Revenue adjustment (per $10M in revenue)
+    // Revenue adjustment from rater (discrete bands)
+    // <$250M = 0%, $250M-$500M = 5%, $500M-$1B = 10%, $1B-$2.5B = 20%, $2.5B-$5B = 35%, $5B+ = 55%
     let revenueAdjustment = 0;
-    if (quoteData.annualRevenue > 0) {
-      const revenueInTenMillions = quoteData.annualRevenue / 10000000;
-      revenueAdjustment = Math.min(revenueInTenMillions * 0.05, 0.25); // 5% per $10M, max 25%
+    const revenue = quoteData.annualRevenue || 0;
+    if (revenue >= 5000000000) {
+      revenueAdjustment = 0.55;
+    } else if (revenue >= 2500000000) {
+      revenueAdjustment = 0.35;
+    } else if (revenue >= 1000000000) {
+      revenueAdjustment = 0.20;
+    } else if (revenue >= 500000000) {
+      revenueAdjustment = 0.10;
+    } else if (revenue >= 250000000) {
+      revenueAdjustment = 0.05;
     }
     const revenueLoad = 1 + revenueAdjustment;
 
