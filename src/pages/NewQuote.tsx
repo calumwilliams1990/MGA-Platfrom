@@ -172,6 +172,22 @@ export default function NewQuote() {
     // Base premium = exposure * rate
     let basePremium = exposureBase * baseRate;
 
+    // Deductible factor from rater (exponential sliding scale)
+    // Formula: factor = a + b * exp(c * deductiblePercent)
+    // Parameters: a = -0.005, b = 0.105, c = -30
+    // Deductible as % of exposure: 0% = 1.0, 10% = 0.909 (max 10% discount)
+    const deductible = quoteData.deductible || 0;
+    let deductibleFactor = 1.0;
+    if (exposureBase > 0 && deductible > 0) {
+      const deductiblePercent = deductible / exposureBase; // As decimal (e.g., 0.05 for 5%)
+      const a = -0.005;
+      const b = 0.105;
+      const c = -30;
+      // Calculate factor and clamp between 0.9 and 1.0
+      deductibleFactor = Math.max(0.9, Math.min(1.0, a + b * Math.exp(c * deductiblePercent)));
+    }
+    basePremium = basePremium * deductibleFactor;
+
     // Policy limit factor - DISCOUNT scale from rater (linear interpolation)
     // $0 = 0% discount, $125M = 10% discount, $250M = 20% discount
     const policyLimit = quoteData.policyLimit || 0;
