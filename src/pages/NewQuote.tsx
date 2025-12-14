@@ -190,8 +190,30 @@ export default function NewQuote() {
       lossLoad = 1.25; // Default 25% load for prior losses
     }
 
+    // Employee count adjustment
+    let employeeAdjustment = 0;
+    switch (quoteData.numberOfEmployees) {
+      case "100-1000":
+        employeeAdjustment = 0.10; // 10%
+        break;
+      case "1000+":
+        employeeAdjustment = 0.20; // 20%
+        break;
+      default: // 0-100
+        employeeAdjustment = 0;
+    }
+    const employeeLoad = 1 + employeeAdjustment;
+
+    // Revenue adjustment (per $10M in revenue)
+    let revenueAdjustment = 0;
+    if (quoteData.annualRevenue > 0) {
+      const revenueInTenMillions = quoteData.annualRevenue / 10000000;
+      revenueAdjustment = Math.min(revenueInTenMillions * 0.05, 0.25); // 5% per $10M, max 25%
+    }
+    const revenueLoad = 1 + revenueAdjustment;
+
     // Calculate intermediate premium before loss amount adjustment
-    let finalPremium = basePremium * locationLoad * lossLoad;
+    let finalPremium = basePremium * locationLoad * lossLoad * employeeLoad * revenueLoad;
 
     // Special rule: losses under $10,000 apply minimum 50% load or $5,000 (whichever is higher)
     if (quoteData.priorLosses && quoteData.priorLossAmount > 0 && quoteData.priorLossAmount < 10000) {
