@@ -179,9 +179,10 @@ export default function NewQuote() {
     const deductible = quoteData.deductible || 0;
     let deductibleFactor = 1.0;
     if (exposureBase > 0 && deductible > 0) {
-      const deductiblePercent = deductible / exposureBase; // As decimal (e.g., 0.05 for 5%)
+      // Convert to percentage (0.01 = 1%, 0.10 = 10%)
+      const deductiblePercent = (deductible / exposureBase);
       const a = -0.005;
-      const b = 0.105;
+      const b = 1.005; // Adjusted so 0% deductible = 1.0 factor
       const c = -30;
       // Calculate factor and clamp between 0.9 and 1.0
       deductibleFactor = Math.max(0.9, Math.min(1.0, a + b * Math.exp(c * deductiblePercent)));
