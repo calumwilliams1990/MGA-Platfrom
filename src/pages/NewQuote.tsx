@@ -184,15 +184,18 @@ export default function NewQuote() {
     }
     basePremium = basePremium * limitFactor;
 
-    // Location count adjustment from rater (sliding scale)
+    // Location count adjustment from rater (continuous sliding scale)
+    // 1 location = 0%, 2-10 = (n-1)*1%, 11+ = 9% + (n-10)*0.3%, capped at 20%
     const locationCount = quoteData.locations.length;
     let locationAdjustment = 0;
-    if (locationCount >= 2 && locationCount <= 10) {
-      locationAdjustment = 0.05; // 5%
-    } else if (locationCount >= 11 && locationCount <= 50) {
-      locationAdjustment = 0.15; // 15%
-    } else if (locationCount > 50) {
-      locationAdjustment = 0.20; // 20%
+    if (locationCount <= 1) {
+      locationAdjustment = 0;
+    } else if (locationCount <= 10) {
+      // 1% per location starting from location 2
+      locationAdjustment = (locationCount - 1) * 0.01;
+    } else {
+      // 9% base (for first 10) + 0.3% per location after 10, capped at 20%
+      locationAdjustment = Math.min(0.09 + (locationCount - 10) * 0.003, 0.20);
     }
     const locationLoad = 1 + locationAdjustment;
 
