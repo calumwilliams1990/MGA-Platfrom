@@ -150,11 +150,15 @@ export default function NewQuote() {
 
   // Calculate premium based on rating factors
   const calculatePremium = (): number => {
-    // Get base rate from occupancy type (rates are in %)
+    // Return $0 until a business type is selected
     const selectedOccupancy = occupancyTypes.find(
       (o) => o.value === quoteData.occupancyType
     );
-    const baseRatePercent = selectedOccupancy?.baseRate || 0.50; // Default 0.50% for referral types
+    if (!selectedOccupancy) {
+      return 0;
+    }
+
+    const baseRatePercent = selectedOccupancy.baseRate;
     const baseRate = baseRatePercent / 100; // Convert to decimal
 
     // Calculate TIV from locations
@@ -163,10 +167,10 @@ export default function NewQuote() {
       0
     );
 
-    // Use TIV if available, otherwise use policy limit
+    // Use TIV if available, otherwise use policy limit (default $1M)
     let exposureBase = totalTIV;
     if (exposureBase === 0) {
-      exposureBase = quoteData.policyLimit || 0;
+      exposureBase = quoteData.policyLimit || 1000000;
     }
 
     // Base premium = exposure * rate
@@ -224,20 +228,20 @@ export default function NewQuote() {
     }
 
     // Employee count adjustment from rater
-    // 0-100 = 5%, 100-1000 = 10%, 1000-10000 = 15%, 10000+ = 20%
-    let employeeAdjustment = 0.05; // Default 5% for 0-100
+    // 0-100 = 0% (base), 100-1000 = 5%, 1000-10000 = 10%, 10000+ = 15%
+    let employeeAdjustment = 0;
     switch (quoteData.numberOfEmployees) {
       case "0-100":
-        employeeAdjustment = 0.05;
+        employeeAdjustment = 0;
         break;
       case "100-1000":
-        employeeAdjustment = 0.10;
+        employeeAdjustment = 0.05;
         break;
       case "1000-10000":
-        employeeAdjustment = 0.15;
+        employeeAdjustment = 0.10;
         break;
       case "10000+":
-        employeeAdjustment = 0.20;
+        employeeAdjustment = 0.15;
         break;
     }
     const employeeLoad = 1 + employeeAdjustment;
