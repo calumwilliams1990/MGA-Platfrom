@@ -38,6 +38,22 @@ export default function QuoteSummary() {
 
   const { quoteData, netPremium, referralStatus } = state;
 
+  // Normalize locations in case this screen is loaded from persisted/non-typed state
+  const normalizedLocations: Location[] = Array.isArray((quoteData as any).locations)
+    ? ((quoteData as any).locations as Location[])
+    : typeof (quoteData as any).locations === "string"
+      ? ((): Location[] => {
+          try {
+            const parsed = JSON.parse((quoteData as any).locations);
+            return Array.isArray(parsed) ? (parsed as Location[]) : [];
+          } catch {
+            return [];
+          }
+        })()
+      : (quoteData as any).locations && typeof (quoteData as any).locations === "object"
+        ? (Object.values((quoteData as any).locations) as Location[])
+        : [];
+
   const brokerageAmount = Math.round(netPremium * (brokeragePercent / 100));
   const grossPremium = netPremium + brokerageAmount;
 
@@ -79,7 +95,7 @@ export default function QuoteSummary() {
         confirmed: quoteData.confirmed,
         manual_referral: quoteData.manualReferral,
         referral_reason: quoteData.referralReason || null,
-        locations: JSON.parse(JSON.stringify(quoteData.locations)),
+        locations: JSON.parse(JSON.stringify(normalizedLocations)),
         estimated_premium: grossPremium || null,
         referral_required: referralStatus.required,
         referral_reasons: referralStatus.reasons,
@@ -109,7 +125,7 @@ export default function QuoteSummary() {
     }
   };
 
-  const locationCount = quoteData.locations?.length || 0;
+  const locationCount = normalizedLocations.length;
 
   const summaryItems = [
     { label: "Insured Name", value: quoteData.insuredName || "-" },
@@ -150,7 +166,7 @@ export default function QuoteSummary() {
             <Button 
               variant="outline" 
               className="gap-2"
-              onClick={() => navigate("/quote/new", { state: { quoteData } })}
+              onClick={() => navigate("/quote/new", { state: { quoteData: { ...quoteData, locations: normalizedLocations } } })}
             >
               <ArrowLeft className="h-4 w-4" />
               Edit Quote
@@ -174,11 +190,11 @@ export default function QuoteSummary() {
               </Card>
 
               {/* Locations Card */}
-              {quoteData.locations.length > 0 && (
+              {normalizedLocations.length > 0 && (
                 <Card className="p-6">
-                  <h2 className="text-lg font-semibold mb-4">Locations ({quoteData.locations.length})</h2>
+                  <h2 className="text-lg font-semibold mb-4">Locations ({normalizedLocations.length})</h2>
                   <div className="space-y-3">
-                    {quoteData.locations.map((loc, index) => (
+                    {normalizedLocations.map((loc, index) => (
                       <div key={loc.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                         <div>
                           <p className="text-sm font-medium">{loc.name || loc.address}</p>
