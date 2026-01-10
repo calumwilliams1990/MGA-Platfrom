@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Dashboard from "@/pages/Dashboard";
 import NewQuote from "@/pages/NewQuote";
+import QuoteSummary from "@/pages/QuoteSummary";
 import MyPolicies from "@/pages/MyPolicies";
 import NotFound from "@/pages/NotFound";
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route element={<AppLayout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/quote/new" element={<NewQuote />} />
+            <Route path="/quote/summary" element={<QuoteSummary />} />
             <Route path="/products/terrorism-liability" element={<NewQuote />} />
             <Route path="/policies" element={<MyPolicies />} />
           </Route>
