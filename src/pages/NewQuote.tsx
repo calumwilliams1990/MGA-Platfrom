@@ -227,21 +227,21 @@ export default function NewQuote() {
       lossLoad = 1.25; // 25% load for prior losses
     }
 
-    // Employee count adjustment from rater
-    // 0-100 = 0% (base), 100-1000 = 5%, 1000-10000 = 10%, 10000+ = 15%
-    let employeeAdjustment = 0;
+    // Employee count adjustment from rater (EL Cover number of employees)
+    // 0-100 = 5%, 100-1000 = 10%, 1000-10000 = 15%, 10000+ = 20%
+    let employeeAdjustment = 0.05; // Default 5% for 0-100
     switch (quoteData.numberOfEmployees) {
       case "0-100":
-        employeeAdjustment = 0;
-        break;
-      case "100-1000":
         employeeAdjustment = 0.05;
         break;
-      case "1000-10000":
+      case "100-1000":
         employeeAdjustment = 0.10;
         break;
-      case "10000+":
+      case "1000-10000":
         employeeAdjustment = 0.15;
+        break;
+      case "10000+":
+        employeeAdjustment = 0.20;
         break;
     }
     const employeeLoad = 1 + employeeAdjustment;
