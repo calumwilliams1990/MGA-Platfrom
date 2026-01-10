@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Check, Save } from "lucide-react";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { QuoteWizard } from "@/components/quote/QuoteWizard";
@@ -82,17 +82,25 @@ const initialQuoteData: QuoteData = {
 
 export default function NewQuote() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const policyId = searchParams.get("id");
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
-  const [quoteData, setQuoteData] = useState<QuoteData>(initialQuoteData);
+  
+  // Check if we're returning from QuoteSummary with existing data
+  const stateData = location.state as { quoteData?: QuoteData } | null;
+  const [quoteData, setQuoteData] = useState<QuoteData>(
+    stateData?.quoteData || initialQuoteData
+  );
   const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(!!policyId);
+  const [loading, setLoading] = useState(!!policyId && !stateData?.quoteData);
 
-  // Load existing policy data if editing
+  // Load existing policy data if editing (skip if we have state data from QuoteSummary)
   useEffect(() => {
     const loadPolicy = async () => {
+      // Skip loading if we already have data from navigation state
+      if (stateData?.quoteData) return;
       if (!policyId) return;
       
       try {
