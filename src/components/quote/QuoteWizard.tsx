@@ -15,6 +15,7 @@ interface QuoteWizardProps {
   quoteData: QuoteData;
   updateQuoteData: (updates: Partial<QuoteData> | ((prev: QuoteData) => Partial<QuoteData>)) => void;
   referralStatus: { required: boolean; reasons: string[] };
+  netPremium: number;
 }
 
 const steps = [
@@ -32,6 +33,7 @@ export function QuoteWizard({
   quoteData,
   updateQuoteData,
   referralStatus,
+  netPremium,
 }: QuoteWizardProps) {
   const goToNextStep = () => {
     if (currentStep < steps.length) {
@@ -99,6 +101,7 @@ export function QuoteWizard({
             updateQuoteData={updateQuoteData}
             onBack={goToPreviousStep}
             referralStatus={referralStatus}
+            netPremium={netPremium}
           />
         );
       default:

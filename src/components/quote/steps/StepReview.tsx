@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Info, ChevronLeft, Cloud, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,7 @@ interface StepReviewProps {
   updateQuoteData: (updates: Partial<QuoteData> | ((prev: QuoteData) => Partial<QuoteData>)) => void;
   onBack: () => void;
   referralStatus: { required: boolean; reasons: string[] };
+  netPremium: number;
 }
 
 export function StepReview({
@@ -25,7 +27,9 @@ export function StepReview({
   updateQuoteData,
   onBack,
   referralStatus,
+  netPremium,
 }: StepReviewProps) {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [supportingDocs, setSupportingDocs] = useState<File[]>([]);
 
@@ -68,11 +72,13 @@ export function StepReview({
       return;
     }
 
-    toast({
-      title: referralStatus.required ? "Quote Submitted for Review" : "Quote Generated",
-      description: referralStatus.required
-        ? "Your quote has been sent to underwriters for review."
-        : "Your quote has been successfully generated.",
+    // Navigate to Quote Summary page with all data
+    navigate("/quote/summary", {
+      state: {
+        quoteData,
+        netPremium,
+        referralStatus,
+      },
     });
   };
 

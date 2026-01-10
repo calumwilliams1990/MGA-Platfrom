@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { CheckCircle, AlertTriangle } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 interface PremiumSidebarProps {
   premium: number;
@@ -8,6 +9,8 @@ interface PremiumSidebarProps {
     reasons: string[];
   };
 }
+
+const DEFAULT_BROKERAGE_PERCENT = 25;
 
 export function PremiumSidebar({ premium, referralStatus }: PremiumSidebarProps) {
   const formatCurrency = (amount: number) => {
@@ -19,21 +22,48 @@ export function PremiumSidebar({ premium, referralStatus }: PremiumSidebarProps)
     }).format(amount);
   };
 
+  // Calculate brokerage (premium passed is the net premium)
+  const netPremium = premium;
+  const brokerageAmount = Math.round(netPremium * (DEFAULT_BROKERAGE_PERCENT / 100));
+  const grossPremium = netPremium + brokerageAmount;
+
   return (
     <div className="space-y-4">
       {/* Premium Estimate Card */}
       <Card className="p-5">
-        <h3 className="font-semibold text-lg mb-1">Premium Estimate</h3>
-        <p className="text-3xl font-bold mb-1">
-          {premium > 0 ? formatCurrency(premium) : "$0"}
-        </p>
-        <p className="text-sm text-muted-foreground mb-4">
-          {premium > 0 ? "Estimated Annual Premium" : "Enter coverage details to see premium estimate"}
-        </p>
-
-        <p className="text-xs text-muted-foreground">
-          Premium updates in real-time as you complete the form
-        </p>
+        <h3 className="font-semibold text-lg mb-3">Premium Estimate</h3>
+        
+        {premium > 0 ? (
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Net Premium</span>
+              <span className="font-medium">{formatCurrency(netPremium)}</span>
+            </div>
+            
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Brokerage ({DEFAULT_BROKERAGE_PERCENT}%)</span>
+              <span className="font-medium">{formatCurrency(brokerageAmount)}</span>
+            </div>
+            
+            <Separator />
+            
+            <div className="flex justify-between">
+              <span className="font-semibold">Gross Premium</span>
+              <span className="text-2xl font-bold text-primary">{formatCurrency(grossPremium)}</span>
+            </div>
+            
+            <p className="text-xs text-muted-foreground">
+              Brokerage adjustable on final quote (0-25%)
+            </p>
+          </div>
+        ) : (
+          <div>
+            <p className="text-3xl font-bold mb-1">$0</p>
+            <p className="text-sm text-muted-foreground">
+              Enter coverage details to see premium estimate
+            </p>
+          </div>
+        )}
       </Card>
 
       {/* Referral Status Card */}

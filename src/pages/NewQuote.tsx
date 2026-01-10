@@ -519,6 +519,7 @@ export default function NewQuote() {
                 quoteData={quoteData}
                 updateQuoteData={updateQuoteData}
                 referralStatus={referralStatus}
+                netPremium={premium}
               />
             </div>
 
