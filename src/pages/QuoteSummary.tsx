@@ -109,11 +109,13 @@ export default function QuoteSummary() {
     }
   };
 
+  const locationCount = quoteData.locations?.length || 0;
+
   const summaryItems = [
     { label: "Insured Name", value: quoteData.insuredName || "-" },
     { label: "Mailing Address", value: quoteData.mailingAddress || "-" },
     { label: "Business Type", value: quoteData.occupancyType || "-" },
-    { label: "Number of Locations", value: `${quoteData.locations.length}` },
+    { label: "Number of Locations", value: locationCount.toString() },
     {
       label: "Policy Period",
       value: quoteData.inceptionDate && quoteData.expiryDate
