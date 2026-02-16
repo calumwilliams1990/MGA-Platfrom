@@ -169,50 +169,31 @@ export default function NewQuote() {
     const baseRatePercent = selectedOccupancy.baseRate;
     const baseRate = baseRatePercent / 100; // Convert to decimal
 
-    // Calculate TIV from locations
-    const totalTIV = quoteData.locations.reduce(
-      (sum, loc) => sum + (loc.propertyValue || 0) + (loc.contentsValue || 0),
-      0
-    );
-
-    // Use TIV if available, otherwise use policy limit (default $1M)
-    let exposureBase = totalTIV;
-    if (exposureBase === 0) {
-      exposureBase = quoteData.policyLimit || 1000000;
-    }
-
-    // Base premium = exposure * rate
-    let basePremium = exposureBase * baseRate;
+    // Base Premium = Policy Limit × Base Rate (per rating documentation)
+    const policyLimit = quoteData.policyLimit || 1000000;
+    let basePremium = policyLimit * baseRate;
 
     // Deductible factor from rater (exponential sliding scale)
-    // Formula: factor = a + b * exp(c * deductiblePercent)
-    // Parameters: a = -0.005, b = 0.105, c = -30
-    // Deductible as % of exposure: 0% = 1.0, 10% = 0.909 (max 10% discount)
     const deductible = quoteData.deductible || 0;
     let deductibleFactor = 1.0;
-    if (exposureBase > 0 && deductible > 0) {
-      // Convert to percentage (0.01 = 1%, 0.10 = 10%)
-      const deductiblePercent = (deductible / exposureBase);
+    if (policyLimit > 0 && deductible > 0) {
+      const deductiblePercent = deductible / policyLimit;
       const a = -0.005;
-      const b = 1.005; // Adjusted so 0% deductible = 1.0 factor
+      const b = 1.005;
       const c = -30;
-      // Calculate factor and clamp between 0.9 and 1.0
       deductibleFactor = Math.max(0.9, Math.min(1.0, a + b * Math.exp(c * deductiblePercent)));
     }
-    basePremium = basePremium * deductibleFactor;
 
-    // Policy limit factor - DISCOUNT scale from rater (linear interpolation)
-    // $0 = 0% discount, $125M = 10% discount, $250M = 20% discount
-    const policyLimit = quoteData.policyLimit || 0;
+    // Policy limit factor - DISCOUNT scale from rater
+    // $0 = 0% discount, $125M = 10% discount, $250M+ = 20% discount
     let limitDiscount = 0;
     if (policyLimit >= 250000000) {
-      limitDiscount = 0.20; // 20% max discount
+      limitDiscount = 0.20;
     } else if (policyLimit > 0) {
-      // Linear scale: 10% per $125M
-      limitDiscount = (policyLimit / 125000000) * 0.10;
+      limitDiscount = (policyLimit / 1250000000);
+      limitDiscount = Math.min(limitDiscount, 0.20);
     }
     const limitFactor = 1 - limitDiscount;
-    basePremium = basePremium * limitFactor;
 
     // Location count adjustment from rater (continuous sliding scale)
     // 1 location = 0%, 2-10 = (n-1)*1%, 11+ = 9% + (n-10)*0.3%, capped at 20%
@@ -295,8 +276,8 @@ export default function NewQuote() {
     }
     const periodLoad = periodFactor * (1 - periodDiscount);
 
-    // Calculate intermediate premium before loss amount adjustment
-    let finalPremium = basePremium * locationLoad * lossLoad * employeeLoad * revenueLoad * periodLoad;
+    // Apply all factors: Base Premium × all load/discount factors
+    let finalPremium = basePremium * deductibleFactor * limitFactor * locationLoad * lossLoad * employeeLoad * revenueLoad * periodLoad;
 
     // Special rule: losses under $10,000 apply minimum 50% load or $5,000 (whichever is higher)
     if (quoteData.priorLosses && quoteData.priorLossAmount > 0 && quoteData.priorLossAmount < 10000) {
@@ -306,7 +287,7 @@ export default function NewQuote() {
     }
 
     // Ensure minimum premium of $500 if there's any exposure
-    if (exposureBase > 0 && finalPremium < 500) {
+    if (policyLimit > 0 && finalPremium < 500) {
       return 500;
     }
 
