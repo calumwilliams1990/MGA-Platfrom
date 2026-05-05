@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload, FileSpreadsheet, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
@@ -112,7 +113,7 @@ export function ZipRiskGradeImport({ onImportComplete }: ZipRiskGradeImportProps
       
       if (error) {
         failedCount += batch.length;
-        console.error("Batch insert error:", error);
+        logger.error("Batch insert error:", error);
       } else {
         successCount += batch.length;
       }
@@ -154,7 +155,7 @@ export function ZipRiskGradeImport({ onImportComplete }: ZipRiskGradeImportProps
       
       onImportComplete?.();
     } catch (error) {
-      console.error("Import error:", error);
+      logger.error("Import error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to import file");
     } finally {
       setIsUploading(false);

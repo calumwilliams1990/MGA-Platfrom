@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Check, Save } from "lucide-react";
@@ -135,7 +136,7 @@ export default function NewQuote() {
           });
         }
       } catch (error) {
-        console.error("Error loading policy:", error);
+        logger.error("Error loading policy:", error);
         toast({
           title: "Error",
           description: "Failed to load policy data.",
@@ -393,7 +394,7 @@ export default function NewQuote() {
 
       navigate("/policies");
     } catch (error) {
-      console.error("Error saving policy:", error);
+      logger.error("Error saving policy:", error);
       toast({
         title: "Error",
         description: "Failed to save policy. Please try again.",

@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FileText, Plus, Calendar, DollarSign } from "lucide-react";
@@ -45,7 +46,7 @@ export default function MyPolicies() {
       if (error) throw error;
       setPolicies(data || []);
     } catch (error) {
-      console.error("Error fetching policies:", error);
+      logger.error("Error fetching policies:", error);
     } finally {
       setLoading(false);
     }

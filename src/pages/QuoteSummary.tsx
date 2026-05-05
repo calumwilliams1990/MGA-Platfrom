@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, Send, CheckCircle, AlertTriangle, Percent } from "lucide-react";
@@ -114,7 +115,7 @@ export default function QuoteSummary() {
 
       navigate("/policies");
     } catch (error) {
-      console.error("Error saving quote:", error);
+      logger.error("Error saving quote:", error);
       toast({
         title: "Error",
         description: "Failed to save quote. Please try again.",
