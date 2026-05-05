@@ -13,14 +13,36 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Require authenticated caller
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      )
+    }
+
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    )
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      )
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Parse the request body which should contain the ZIP data
     const { zipData } = await req.json()
-    
+
     if (!zipData || !Array.isArray(zipData)) {
       return new Response(
         JSON.stringify({ error: 'zipData array required' }),
@@ -28,7 +50,19 @@ Deno.serve(async (req) => {
       )
     }
 
-    console.log(`Processing ${zipData.length} ZIP codes...`)
+    // Validate rows
+    const validGrades = ['A', 'B', 'C', 'D', 'E']
+    const invalidRows = zipData.filter((row: any) =>
+      !row?.zip_code || !row?.risk_grade || !validGrades.includes(row.risk_grade)
+    )
+    if (invalidRows.length > 0) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid data format', invalid: invalidRows.length }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      )
+    }
+
+    console.log(`User ${user.id} importing ${zipData.length} ZIP codes...`)
 
     // Insert in batches of 500
     const batchSize = 500
