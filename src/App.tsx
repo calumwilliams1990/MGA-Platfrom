@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Dashboard from "@/pages/Dashboard";
-import NewQuote from "@/pages/NewQuote";
+import MarineTowQuote from "@/pages/MarineTowQuote";
 import QuoteSummary from "@/pages/QuoteSummary";
 import MyPolicies from "@/pages/MyPolicies";
 import NotFound from "@/pages/NotFound";
@@ -21,9 +21,10 @@ const App = () => (
         <Routes>
           <Route element={<AppLayout />}>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/quote/new" element={<NewQuote />} />
+            <Route path="/quote/new" element={<MarineTowQuote />} />
+            <Route path="/quote/marine-tow" element={<MarineTowQuote />} />
             <Route path="/quote/summary" element={<QuoteSummary />} />
-            <Route path="/products/terrorism-liability" element={<NewQuote />} />
+            <Route path="/products/marine-tow" element={<MarineTowQuote />} />
             <Route path="/policies" element={<MyPolicies />} />
           </Route>
           <Route path="*" element={<NotFound />} />
