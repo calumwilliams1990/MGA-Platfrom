@@ -102,7 +102,9 @@ export default function QuoteSummary() {
         referral_reasons: referralStatus.reasons,
       };
 
-      const { error } = await supabase.from("policies").insert([policyData]);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+      const { error } = await supabase.from("policies").insert([{ ...policyData, user_id: user.id }]);
 
       if (error) throw error;
 
