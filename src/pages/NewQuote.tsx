@@ -371,17 +371,17 @@ export default function NewQuote() {
       };
 
       let error;
-      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       if (policyId) {
-        // Update existing policy
         const result = await supabase
           .from("policies")
           .update(policyData)
           .eq("id", policyId);
         error = result.error;
       } else {
-        // Insert new policy
-        const result = await supabase.from("policies").insert([policyData]);
+        const result = await supabase.from("policies").insert([{ ...policyData, user_id: user.id }]);
         error = result.error;
       }
 
