@@ -39,6 +39,7 @@ export type Database = {
           referral_required: boolean | null
           status: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           annual_revenue?: number | null
@@ -64,6 +65,7 @@ export type Database = {
           referral_required?: boolean | null
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           annual_revenue?: number | null
@@ -89,6 +91,7 @@ export type Database = {
           referral_required?: boolean | null
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
