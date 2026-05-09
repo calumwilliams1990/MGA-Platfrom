@@ -15,7 +15,7 @@ import { logger } from "@/lib/logger";
 const credsSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email" }).max(255),
   password: z.string().min(8, { message: "Password must be at least 8 characters" }).max(72),
-});
+}).required();
 
 export default function Auth() {
   const navigate = useNavigate();
