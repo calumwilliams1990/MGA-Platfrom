@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { Search, Plus, RefreshCw, Bell } from "lucide-react";
+import { Search, Plus, RefreshCw, Bell, LogOut } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -23,6 +24,7 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ breadcrumbs = [], showActions = true }: AppHeaderProps) {
+  const { signOut, user } = useAuth();
   return (
     <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-4 border-b bg-background px-6">
       <div className="flex items-center gap-4">
@@ -77,6 +79,12 @@ export function AppHeader({ breadcrumbs = [], showActions = true }: AppHeaderPro
               3
             </span>
           </Button>
+
+          {user && (
+            <Button variant="ghost" size="icon" onClick={signOut} title="Sign out">
+              <LogOut className="h-5 w-5" />
+            </Button>
+          )}
         </div>
       )}
     </header>
