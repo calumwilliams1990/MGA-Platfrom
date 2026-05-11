@@ -194,7 +194,7 @@ export default function MarineTowQuote() {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<MarineTowData>(initial);
   const [submitted, setSubmitted] = useState(false);
-  const [showReferrals, setShowReferrals] = useState(false);
+  const [maxStepReached, setMaxStepReached] = useState(1);
 
   type SanctionMatch = { id: string; name: string; type: string; program: string; score: number };
   type SanctionsResult = { matchCount: number; matches: SanctionMatch[]; checkedAt: string };
@@ -276,22 +276,27 @@ export default function MarineTowQuote() {
   if (data.portCoverRequired) {
     referralReasons.push("Port cover required");
   }
-  if (isTow) {
-    if (!data.knockForKnock) referralReasons.push("Knock-for-knock not confirmed");
-    if (!data.towagePlanApproved)
-      referralReasons.push("Towage plan / MWS approval not confirmed");
-    if (!data.singleVessel)
-      referralReasons.push("Single vessel (no double tow) not confirmed");
+  // Attestation-based reasons only surface once the user has visited the
+  // Attestations step (so we don't show "not confirmed" before the question
+  // has even been asked).
+  if (maxStepReached >= 5) {
+    if (isTow) {
+      if (!data.knockForKnock) referralReasons.push("Knock-for-knock not confirmed");
+      if (!data.towagePlanApproved)
+        referralReasons.push("Towage plan / MWS approval not confirmed");
+      if (!data.singleVessel)
+        referralReasons.push("Single vessel (no double tow) not confirmed");
+    }
+    if (isVoyage && !data.appropriatePlan) {
+      referralReasons.push("Appropriate voyage plan not confirmed");
+    }
+    if (!data.vesselSurveyConfirmed)
+      referralReasons.push("Vessel seaworthiness survey not confirmed");
+    if (!data.cargoLiabilityExcluded)
+      referralReasons.push("Cargo liability exclusion not confirmed");
+    if (!data.crewCoverRequired && !data.crewCoverExcluded)
+      referralReasons.push("Crew cover exclusion not confirmed");
   }
-  if (isVoyage && !data.appropriatePlan) {
-    referralReasons.push("Appropriate voyage plan not confirmed");
-  }
-  if (!data.vesselSurveyConfirmed)
-    referralReasons.push("Vessel seaworthiness survey not confirmed");
-  if (!data.cargoLiabilityExcluded)
-    referralReasons.push("Cargo liability exclusion not confirmed");
-  if (!data.crewCoverRequired && !data.crewCoverExcluded)
-    referralReasons.push("Crew cover exclusion not confirmed");
   if (data.triggerManualReferral)
     referralReasons.push("Manual referral triggered");
 
@@ -348,7 +353,6 @@ export default function MarineTowQuote() {
   };
 
   const handleSubmit = () => {
-    setShowReferrals(true);
     if (declineReasons.length > 0) {
       toast({
         title: "Cannot submit — risk declined",
@@ -581,7 +585,7 @@ export default function MarineTowQuote() {
           </div>
 
           {/* Live decline / referral banner */}
-          {showReferrals && (declineReasons.length > 0 || referralReasons.length > 0) && (
+          {(declineReasons.length > 0 || referralReasons.length > 0) && (
             <div
               className={cn(
                 "rounded-md border p-3 mb-4 space-y-1 text-sidebar-foreground",
