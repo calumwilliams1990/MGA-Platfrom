@@ -126,6 +126,32 @@ export default function MarineTowQuote() {
   const [data, setData] = useState<MarineTowData>(initial);
   const [submitted, setSubmitted] = useState(false);
 
+  type SanctionMatch = { id: string; name: string; type: string; program: string; score: number };
+  type SanctionsResult = { matchCount: number; matches: SanctionMatch[]; checkedAt: string };
+  const [sanctions, setSanctions] = useState<SanctionsResult | null>(null);
+  const [sanctionsLoading, setSanctionsLoading] = useState(false);
+  const [sanctionsError, setSanctionsError] = useState<string | null>(null);
+
+  const runSanctionsCheck = async () => {
+    const name = data.insuredName.trim();
+    if (name.length < 2) return;
+    setSanctionsLoading(true);
+    setSanctionsError(null);
+    setSanctions(null);
+    try {
+      const { data: result, error } = await supabase.functions.invoke(
+        "ofac-sanctions-check",
+        { body: { name } },
+      );
+      if (error) throw error;
+      setSanctions(result as SanctionsResult);
+    } catch (e) {
+      setSanctionsError(e instanceof Error ? e.message : "Check failed");
+    } finally {
+      setSanctionsLoading(false);
+    }
+  };
+
   const update = (u: Partial<MarineTowData>) =>
     setData((p) => ({ ...p, ...u }));
 
