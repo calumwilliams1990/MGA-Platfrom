@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
-import { CalendarIcon, ChevronLeft, Check, Anchor } from "lucide-react";
+import { CalendarIcon, ChevronLeft, Check, Anchor, ShieldCheck, ShieldAlert, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -355,9 +356,57 @@ export default function MarineTowQuote() {
                     <Input
                       id="insuredName"
                       value={data.insuredName}
-                      onChange={(e) => update({ insuredName: e.target.value })}
+                      onChange={(e) => {
+                        update({ insuredName: e.target.value });
+                        setSanctions(null);
+                        setSanctionsError(null);
+                      }}
+                      onBlur={runSanctionsCheck}
                       placeholder="e.g. Acme Marine Ltd"
                     />
+                    {sanctionsLoading && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        Running OFAC sanctions check...
+                      </p>
+                    )}
+                    {sanctionsError && (
+                      <p className="text-xs text-destructive">
+                        Sanctions check failed: {sanctionsError}
+                      </p>
+                    )}
+                    {sanctions && !sanctionsLoading && sanctions.matchCount === 0 && (
+                      <p className="text-xs text-emerald-600 flex items-center gap-1">
+                        <ShieldCheck className="h-3 w-3" />
+                        No OFAC matches found
+                      </p>
+                    )}
+                    {sanctions && !sanctionsLoading && sanctions.matchCount > 0 && (
+                      <div className="rounded-md border border-destructive/50 bg-destructive/5 p-3 space-y-2">
+                        <p className="text-sm font-medium text-destructive flex items-center gap-1">
+                          <ShieldAlert className="h-4 w-4" />
+                          {sanctions.matchCount} potential OFAC match
+                          {sanctions.matchCount > 1 ? "es" : ""} — review required
+                        </p>
+                        <ul className="text-xs space-y-1">
+                          {sanctions.matches.slice(0, 5).map((m, i) => (
+                            <li key={i} className="flex justify-between gap-2">
+                              <span className="truncate">
+                                <span className="font-medium">{m.name}</span>
+                                <span className="text-muted-foreground">
+                                  {" "}
+                                  · {m.type || "—"}
+                                  {m.program ? ` · ${m.program}` : ""}
+                                </span>
+                              </span>
+                              <span className="text-muted-foreground shrink-0">
+                                {Math.round(m.score * 100)}%
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="insuredCountry">Insured country</Label>
