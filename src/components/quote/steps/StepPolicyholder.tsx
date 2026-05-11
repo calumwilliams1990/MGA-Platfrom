@@ -1,4 +1,6 @@
-import { Info, ChevronLeft, AlertTriangle } from "lucide-react";
+import { Info, ChevronLeft, AlertTriangle, ShieldCheck, ShieldAlert, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -64,6 +66,31 @@ export function StepPolicyholder({
     (o) => o.value === quoteData.occupancyType
   );
 
+  type SanctionMatch = { id: string; name: string; type: string; program: string; score: number };
+  type SanctionsResult = { matchCount: number; matches: SanctionMatch[]; checkedAt: string };
+  const [sanctions, setSanctions] = useState<SanctionsResult | null>(null);
+  const [sanctionsLoading, setSanctionsLoading] = useState(false);
+  const [sanctionsError, setSanctionsError] = useState<string | null>(null);
+
+  const runSanctionsCheck = async () => {
+    const name = quoteData.insuredName.trim();
+    if (name.length < 2) return;
+    setSanctionsLoading(true);
+    setSanctionsError(null);
+    setSanctions(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("ofac-sanctions-check", {
+        body: { name },
+      });
+      if (error) throw error;
+      setSanctions(data as SanctionsResult);
+    } catch (e) {
+      setSanctionsError(e instanceof Error ? e.message : "Check failed");
+    } finally {
+      setSanctionsLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
@@ -98,8 +125,47 @@ export function StepPolicyholder({
             id="insuredName"
             placeholder="Write insured person name..."
             value={quoteData.insuredName}
-            onChange={(e) => updateQuoteData({ insuredName: e.target.value })}
+            onChange={(e) => {
+              updateQuoteData({ insuredName: e.target.value });
+              setSanctions(null);
+              setSanctionsError(null);
+            }}
+            onBlur={runSanctionsCheck}
           />
+          {sanctionsLoading && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              Running OFAC sanctions check...
+            </p>
+          )}
+          {sanctionsError && (
+            <p className="text-xs text-destructive">Sanctions check failed: {sanctionsError}</p>
+          )}
+          {sanctions && !sanctionsLoading && sanctions.matchCount === 0 && (
+            <p className="text-xs text-emerald-600 flex items-center gap-1">
+              <ShieldCheck className="h-3 w-3" />
+              No OFAC matches found
+            </p>
+          )}
+          {sanctions && !sanctionsLoading && sanctions.matchCount > 0 && (
+            <div className="rounded-md border border-destructive/50 bg-destructive/5 p-3 space-y-2">
+              <p className="text-sm font-medium text-destructive flex items-center gap-1">
+                <ShieldAlert className="h-4 w-4" />
+                {sanctions.matchCount} potential OFAC match{sanctions.matchCount > 1 ? "es" : ""} — review required
+              </p>
+              <ul className="text-xs space-y-1">
+                {sanctions.matches.slice(0, 5).map((m, i) => (
+                  <li key={i} className="flex justify-between gap-2">
+                    <span className="truncate">
+                      <span className="font-medium">{m.name}</span>
+                      <span className="text-muted-foreground"> · {m.type || "—"}{m.program ? ` · ${m.program}` : ""}</span>
+                    </span>
+                    <span className="text-muted-foreground shrink-0">{Math.round(m.score * 100)}%</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
