@@ -582,28 +582,25 @@ export default function MarineTowQuote() {
           {(declineReasons.length > 0 || referralReasons.length > 0) && (
             <div
               className={cn(
-                "rounded-md border p-3 mb-4 space-y-1",
+                "rounded-md border p-3 mb-4 space-y-1 text-sidebar-foreground",
                 declineReasons.length > 0
                   ? "border-destructive/50 bg-destructive/5"
                   : "border-warning/40 bg-warning/5",
               )}
             >
               <p
-                className={cn(
-                  "text-sm font-medium flex items-center gap-1",
-                  declineReasons.length > 0 ? "text-destructive" : "text-warning",
-                )}
+                className="text-sm font-medium flex items-center gap-1 text-sidebar-foreground"
               >
                 {declineReasons.length > 0 ? (
-                  <XCircle className="h-4 w-4" />
+                  <XCircle className="h-4 w-4 text-destructive" />
                 ) : (
-                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTriangle className="h-4 w-4 text-warning" />
                 )}
                 {declineReasons.length > 0
                   ? "Decline triggered"
                   : `${referralReasons.length} referral reason${referralReasons.length > 1 ? "s" : ""}`}
               </p>
-              <ul className="text-xs list-disc pl-5">
+              <ul className="text-xs list-disc pl-5 text-sidebar-foreground">
                 {[...declineReasons, ...referralReasons].map((r) => (
                   <li key={r}>{r}</li>
                 ))}
