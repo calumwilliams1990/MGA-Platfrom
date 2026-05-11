@@ -205,6 +205,11 @@ export default function MarineTowQuote() {
   const update = (u: Partial<MarineTowData>) =>
     setData((p) => ({ ...p, ...u }));
 
+  const goToStep = (n: number) => {
+    setStep(n);
+    setMaxStepReached((m) => Math.max(m, n));
+  };
+
   const runSanctionsCheck = async () => {
     const name = data.insuredName.trim();
     if (name.length < 2) return;
@@ -544,7 +549,7 @@ export default function MarineTowQuote() {
                   <div key={s.id} className="flex items-center flex-1">
                     <button
                       type="button"
-                      onClick={() => setStep(s.id)}
+                      onClick={() => goToStep(s.id)}
                       className="flex flex-col items-center group"
                     >
                       <div
@@ -1271,7 +1276,7 @@ export default function MarineTowQuote() {
             <div className="flex justify-between pt-6">
               <Button
                 variant="ghost"
-                onClick={() => setStep((s) => Math.max(1, s - 1))}
+                onClick={() => goToStep(Math.max(1, step - 1))}
                 disabled={step === 1}
                 className="gap-2"
               >
@@ -1280,7 +1285,7 @@ export default function MarineTowQuote() {
               </Button>
               {step < steps.length ? (
                 <Button
-                  onClick={() => setStep((s) => s + 1)}
+                  onClick={() => goToStep(step + 1)}
                   disabled={!stepValid()}
                 >
                   Continue
