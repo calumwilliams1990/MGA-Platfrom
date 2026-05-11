@@ -644,9 +644,13 @@ export default function MarineTowQuote() {
                           mode="single"
                           selected={data.inceptionDate}
                           onSelect={(d) => {
-                            update({ inceptionDate: d });
-                            if (d && data.expiryDate && data.expiryDate < d) {
-                              update({ expiryDate: undefined });
+                            if (d) {
+                              update({
+                                inceptionDate: d,
+                                expiryDate: addDays(d, 30),
+                              });
+                            } else {
+                              update({ inceptionDate: undefined });
                             }
                           }}
                           initialFocus
