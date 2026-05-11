@@ -47,7 +47,7 @@ const mainNavItems = [
     url: "/products",
     icon: Package,
     children: [
-      { title: "Terrorism Liability", url: "/products/terrorism-liability" },
+      { title: "Marine Tow", url: "/products/marine-tow" },
     ],
   },
   {
