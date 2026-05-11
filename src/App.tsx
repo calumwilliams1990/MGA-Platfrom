@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Auth from "@/pages/Auth";
 import Dashboard from "@/pages/Dashboard";
 import MarineTowQuote from "@/pages/MarineTowQuote";
@@ -24,15 +23,13 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/auth" element={<Auth />} />
-            <Route element={<ProtectedRoute />}>
-              <Route element={<AppLayout />}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/quote/new" element={<MarineTowQuote />} />
-                <Route path="/quote/marine-tow" element={<MarineTowQuote />} />
-                <Route path="/quote/summary" element={<QuoteSummary />} />
-                <Route path="/products/marine-tow" element={<MarineTowQuote />} />
-                <Route path="/policies" element={<MyPolicies />} />
-              </Route>
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/quote/new" element={<MarineTowQuote />} />
+              <Route path="/quote/marine-tow" element={<MarineTowQuote />} />
+              <Route path="/quote/summary" element={<QuoteSummary />} />
+              <Route path="/products/marine-tow" element={<MarineTowQuote />} />
+              <Route path="/policies" element={<MyPolicies />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
