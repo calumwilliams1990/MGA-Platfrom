@@ -194,6 +194,7 @@ export default function MarineTowQuote() {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<MarineTowData>(initial);
   const [submitted, setSubmitted] = useState(false);
+  const [showReferrals, setShowReferrals] = useState(false);
 
   type SanctionMatch = { id: string; name: string; type: string; program: string; score: number };
   type SanctionsResult = { matchCount: number; matches: SanctionMatch[]; checkedAt: string };
@@ -347,6 +348,7 @@ export default function MarineTowQuote() {
   };
 
   const handleSubmit = () => {
+    setShowReferrals(true);
     if (declineReasons.length > 0) {
       toast({
         title: "Cannot submit — risk declined",
@@ -579,7 +581,7 @@ export default function MarineTowQuote() {
           </div>
 
           {/* Live decline / referral banner */}
-          {(declineReasons.length > 0 || referralReasons.length > 0) && (
+          {showReferrals && (declineReasons.length > 0 || referralReasons.length > 0) && (
             <div
               className={cn(
                 "rounded-md border p-3 mb-4 space-y-1 text-sidebar-foreground",
