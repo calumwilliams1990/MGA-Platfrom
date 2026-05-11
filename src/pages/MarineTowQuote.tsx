@@ -491,6 +491,7 @@ export default function MarineTowQuote() {
                     setSubmitted(false);
                     setStep(1);
                     setSanctions(null);
+                    setMaxStepReached(1);
                   }}
                 >
                   New quote
