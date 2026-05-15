@@ -19,6 +19,7 @@ interface Policy {
   inception_date: string | null;
   expiry_date: string | null;
   estimated_premium: number | null;
+  product: "terror_liability" | "marine_tow";
 }
 
 const statusConfig: Record<string, { label: string; className: string }> = {
@@ -38,13 +39,29 @@ export default function MyPolicies() {
 
   const fetchPolicies = async () => {
     try {
-      const { data, error } = await supabase
-        .from("policies")
-        .select("id, created_at, updated_at, status, insured_name, policy_limit, inception_date, expiry_date, estimated_premium")
-        .order("updated_at", { ascending: false });
-
-      if (error) throw error;
-      setPolicies(data || []);
+      const [tl, mt] = await Promise.all([
+        supabase
+          .from("policies")
+          .select("id, created_at, updated_at, status, insured_name, policy_limit, inception_date, expiry_date, estimated_premium")
+          .order("updated_at", { ascending: false }),
+        supabase
+          .from("marine_tow_quotes")
+          .select("id, created_at, updated_at, status, insured_name, estimated_premium")
+          .order("updated_at", { ascending: false }),
+      ]);
+      if (tl.error) throw tl.error;
+      if (mt.error) throw mt.error;
+      const combined: Policy[] = [
+        ...(tl.data || []).map((p) => ({ ...p, product: "terror_liability" as const })),
+        ...(mt.data || []).map((p) => ({
+          ...p,
+          policy_limit: null,
+          inception_date: null,
+          expiry_date: null,
+          product: "marine_tow" as const,
+        })),
+      ].sort((a, b) => (a.updated_at < b.updated_at ? 1 : -1));
+      setPolicies(combined);
     } catch (error) {
       logger.error("Error fetching policies:", error);
     } finally {
@@ -150,7 +167,13 @@ export default function MyPolicies() {
                   </div>
 
                   <Button variant="outline" className="w-full" asChild>
-                    <Link to={`/quote/new?id=${policy.id}`}>
+                    <Link
+                      to={
+                        policy.product === "marine_tow"
+                          ? `/quote/marine-tow?id=${policy.id}`
+                          : `/quote/new?id=${policy.id}`
+                      }
+                    >
                       Continue Editing
                     </Link>
                   </Button>
