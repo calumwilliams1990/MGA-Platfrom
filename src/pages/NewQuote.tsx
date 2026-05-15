@@ -551,6 +551,8 @@ export default function NewQuote() {
                 updateQuoteData={updateQuoteData}
                 referralStatus={referralStatus}
                 netPremium={premium}
+                onSave={() => savePolicy()}
+                saving={saving}
               />
             </div>
 

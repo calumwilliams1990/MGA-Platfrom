@@ -1,5 +1,6 @@
-import { Check } from "lucide-react";
+import { Check, Save } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { QuoteData, Location } from "@/pages/NewQuote";
 import { StepDocumentation } from "./steps/StepDocumentation";
@@ -16,6 +17,8 @@ interface QuoteWizardProps {
   updateQuoteData: (updates: Partial<QuoteData> | ((prev: QuoteData) => Partial<QuoteData>)) => void;
   referralStatus: { required: boolean; reasons: string[] };
   netPremium: number;
+  onSave?: () => void;
+  saving?: boolean;
 }
 
 const steps = [
@@ -34,6 +37,8 @@ export function QuoteWizard({
   updateQuoteData,
   referralStatus,
   netPremium,
+  onSave,
+  saving,
 }: QuoteWizardProps) {
   const goToNextStep = () => {
     if (currentStep < steps.length) {
@@ -110,6 +115,22 @@ export function QuoteWizard({
   };
 
   return (
-    <Card className="p-6">{renderStep()}</Card>
+    <Card className="p-6 space-y-4">
+      {renderStep()}
+      {onSave && currentStep < 6 && (
+        <div className="flex justify-end border-t pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            className="gap-2"
+            onClick={onSave}
+            disabled={saving}
+          >
+            <Save className="h-4 w-4" />
+            {saving ? "Saving..." : "Save progress"}
+          </Button>
+        </div>
+      )}
+    </Card>
   );
 }
