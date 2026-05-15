@@ -147,11 +147,12 @@ const initial: MarineTowData = {
 
 const steps = [
   { id: 1, title: "Policy Holder" },
-  { id: 2, title: "Cover Fundamentals" },
-  { id: 3, title: "Vessel" },
-  { id: 4, title: "Voyage" },
-  { id: 5, title: "Attestations" },
-  { id: 6, title: "Declaration" },
+  { id: 2, title: "Operator History" },
+  { id: 3, title: "Cover Fundamentals" },
+  { id: 4, title: "Vessel" },
+  { id: 5, title: "Voyage" },
+  { id: 6, title: "Attestations" },
+  { id: 7, title: "Declaration" },
 ];
 
 function CountrySelect({
