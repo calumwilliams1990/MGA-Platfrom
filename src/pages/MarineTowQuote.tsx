@@ -426,16 +426,6 @@ export default function MarineTowQuote() {
     switch (step) {
       case 1:
         return (
-          !!data.inceptionDate &&
-          !!data.expiryDate &&
-          policyDurationDays > 0 &&
-          data.piProvider !== "" &&
-          data.setTargetPrice !== "" &&
-          (data.setTargetPrice === "no" ||
-            (data.setTargetPrice === "yes" && Number(data.targetPrice) > 0))
-        );
-      case 2:
-        return (
           data.insuredName.trim() !== "" &&
           data.address.trim() !== "" &&
           data.insuredCountry !== "" &&
@@ -443,6 +433,16 @@ export default function MarineTowQuote() {
           data.claimsLast5Years !== "" &&
           (data.claimsLast5Years === "no" ||
             data.claimsExplanation.trim() !== "")
+        );
+      case 2:
+        return (
+          !!data.inceptionDate &&
+          !!data.expiryDate &&
+          policyDurationDays > 0 &&
+          data.piProvider !== "" &&
+          data.setTargetPrice !== "" &&
+          (data.setTargetPrice === "no" ||
+            (data.setTargetPrice === "yes" && Number(data.targetPrice) > 0))
         );
       case 3:
         return (
