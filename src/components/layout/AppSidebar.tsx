@@ -37,6 +37,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const mainNavItems = [
   {
@@ -76,9 +79,28 @@ const mainNavItems = [
 
 export function AppSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const isAdmin = useIsAdmin();
+  const { user } = useAuth();
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth", { replace: true });
+  };
+  const displayEmail = user?.email ?? "";
+  const displayName =
+    (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.full_name ||
+    (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.name ||
+    displayEmail.split("@")[0] ||
+    "User";
+  const initials = displayName
+    .split(/\s+/)
+    .map((s) => s[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
   const [productsOpen, setProductsOpen] = useState(
     location.pathname.startsWith("/products")
   );
@@ -189,17 +211,17 @@ export function AppSidebar() {
           <Avatar className="h-10 w-10">
             <AvatarImage src="/placeholder.svg" />
             <AvatarFallback className="bg-app-sidebar-accent text-app-sidebar-foreground">
-              CW
+              {initials || "U"}
             </AvatarFallback>
           </Avatar>
           {!collapsed && (
             <>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-app-sidebar-foreground truncate">
-                  Calum W
+                  {displayName}
                 </p>
                 <p className="text-xs text-app-sidebar-foreground/60 truncate">
-                  calum@test.com
+                  {displayEmail}
                 </p>
               </div>
               <DropdownMenu>
@@ -213,7 +235,10 @@ export function AppSidebar() {
                     <Settings className="mr-2 h-4 w-4" />
                     Account Settings
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-destructive">
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onSelect={handleSignOut}
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
                   </DropdownMenuItem>
