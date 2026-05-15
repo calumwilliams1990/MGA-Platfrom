@@ -458,6 +458,8 @@ export default function MarineTowQuote() {
       case 2:
         return (
           data.yearsExperience !== "" &&
+          (data.yearsExperience !== "less_than_3" ||
+            data.individualExperience !== "") &&
           data.claimsLast5Years !== "" &&
           (data.claimsLast5Years === "no" ||
             data.claimsExplanation.trim() !== "")
