@@ -215,6 +215,7 @@ export default function MarineTowQuote() {
 
   type SanctionMatch = { id: string; name: string; type: string; program: string; score: number };
   type SanctionsResult = { matchCount: number; matches: SanctionMatch[]; checkedAt: string };
+  const SANCTIONS_THRESHOLD = 0.95;
   const [sanctions, setSanctions] = useState<SanctionsResult | null>(null);
   const [sanctionsLoading, setSanctionsLoading] = useState(false);
   const [sanctionsError, setSanctionsError] = useState<string | null>(null);
