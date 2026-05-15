@@ -50,6 +50,42 @@ export type Database = {
         }
         Relationships: []
       }
+      marine_tow_quotes: {
+        Row: {
+          created_at: string
+          estimated_premium: number | null
+          id: string
+          insured_name: string | null
+          payload: Json
+          status: string
+          updated_at: string
+          user_id: string
+          vessel_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          estimated_premium?: number | null
+          id?: string
+          insured_name?: string | null
+          payload?: Json
+          status?: string
+          updated_at?: string
+          user_id: string
+          vessel_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          estimated_premium?: number | null
+          id?: string
+          insured_name?: string | null
+          payload?: Json
+          status?: string
+          updated_at?: string
+          user_id?: string
+          vessel_name?: string | null
+        }
+        Relationships: []
+      }
       policies: {
         Row: {
           annual_revenue: number | null
