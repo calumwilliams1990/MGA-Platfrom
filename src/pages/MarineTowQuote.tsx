@@ -1260,9 +1260,6 @@ export default function MarineTowQuote() {
                       readOnly
                       className="bg-muted/50"
                     />
-                    <p className="text-xs text-muted-foreground">
-                      $25k ≤ $25m · $50k ≤ $50m · $75k ≤ $100m
-                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label>Trip type</Label>
