@@ -147,11 +147,12 @@ const initial: MarineTowData = {
 
 const steps = [
   { id: 1, title: "Policy Holder" },
-  { id: 2, title: "Cover Fundamentals" },
-  { id: 3, title: "Vessel" },
-  { id: 4, title: "Voyage" },
-  { id: 5, title: "Attestations" },
-  { id: 6, title: "Declaration" },
+  { id: 2, title: "Operator History" },
+  { id: 3, title: "Cover Fundamentals" },
+  { id: 4, title: "Vessel" },
+  { id: 5, title: "Voyage" },
+  { id: 6, title: "Attestations" },
+  { id: 7, title: "Declaration" },
 ];
 
 function CountrySelect({
@@ -214,6 +215,7 @@ export default function MarineTowQuote() {
 
   type SanctionMatch = { id: string; name: string; type: string; program: string; score: number };
   type SanctionsResult = { matchCount: number; matches: SanctionMatch[]; checkedAt: string };
+  const SANCTIONS_THRESHOLD = 0.95;
   const [sanctions, setSanctions] = useState<SanctionsResult | null>(null);
   const [sanctionsLoading, setSanctionsLoading] = useState(false);
   const [sanctionsError, setSanctionsError] = useState<string | null>(null);
@@ -382,9 +384,11 @@ export default function MarineTowQuote() {
       referralReasons.push(`${label}: ${country} requires UW review`);
     }
   }
-  if (sanctions && sanctions.matchCount > 0) {
+  const strongSanctionsMatches =
+    sanctions?.matches.filter((m) => m.score >= SANCTIONS_THRESHOLD) ?? [];
+  if (strongSanctionsMatches.length > 0) {
     declineReasons.push(
-      `OFAC sanctions match (${sanctions.matchCount}) on insured name`,
+      `OFAC sanctions match (${strongSanctionsMatches.length}) on insured name`,
     );
   }
   if (data.inceptionDate && data.inceptionDate < startOfDay(new Date())) {
@@ -408,7 +412,7 @@ export default function MarineTowQuote() {
   // Attestation-based reasons only surface once the user has visited the
   // Attestations step (so we don't show "not confirmed" before the question
   // has even been asked).
-  if (maxStepReached >= 5) {
+  if (maxStepReached >= 6) {
     if (isTow) {
       if (!data.knockForKnock) referralReasons.push("Knock-for-knock not confirmed");
       if (!data.towagePlanApproved)
@@ -443,13 +447,16 @@ export default function MarineTowQuote() {
                 data.addressCity.trim() !== "" &&
                 data.addressPostcode.trim() !== ""
               : data.address.trim() !== ""
-          ) &&
+          )
+        );
+      case 2:
+        return (
           data.yearsExperience !== "" &&
           data.claimsLast5Years !== "" &&
           (data.claimsLast5Years === "no" ||
             data.claimsExplanation.trim() !== "")
         );
-      case 2:
+      case 3:
         return (
           !!data.inceptionDate &&
           !!data.expiryDate &&
@@ -459,7 +466,7 @@ export default function MarineTowQuote() {
           (data.setTargetPrice === "no" ||
             (data.setTargetPrice === "yes" && Number(data.targetPrice) > 0))
         );
-      case 3:
+      case 4:
         return (
           data.vesselName.trim() !== "" &&
           data.flagCountry !== "" &&
@@ -467,7 +474,7 @@ export default function MarineTowQuote() {
           Number(data.grossTonnage) > 0 &&
           data.vesselType.trim() !== ""
         );
-      case 4:
+      case 5:
         return (
           data.limit !== "" &&
           data.departureCountry !== "" &&
@@ -476,9 +483,9 @@ export default function MarineTowQuote() {
           (isTow ? data.mwsSurveyor !== "" : true) &&
           (!data.portCoverRequired || data.portCoverDetails.trim() !== "")
         );
-      case 5:
-        return true; // attestations are advisory; unticked → referral, not block
       case 6:
+        return true; // attestations are advisory; unticked → referral, not block
+      case 7:
         return (
           data.declarationConfirmed &&
           (!data.triggerManualReferral ||
@@ -753,8 +760,8 @@ export default function MarineTowQuote() {
           )}
 
           <Card className="p-6">
-            {/* ============ STEP 2: COVER FUNDAMENTALS ============ */}
-            {step === 2 && (
+            {/* ============ STEP 3: COVER FUNDAMENTALS ============ */}
+            {step === 3 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Cover Fundamentals</h2>
@@ -973,21 +980,21 @@ export default function MarineTowQuote() {
                         Sanctions check failed: {sanctionsError}
                       </p>
                     )}
-                    {sanctions && !sanctionsLoading && sanctions.matchCount === 0 && (
+                    {sanctions && !sanctionsLoading && strongSanctionsMatches.length === 0 && (
                       <p className="text-xs text-emerald-600 flex items-center gap-1">
                         <ShieldCheck className="h-3 w-3" />
-                        No OFAC matches found
+                        No high-confidence OFAC matches found
                       </p>
                     )}
-                    {sanctions && !sanctionsLoading && sanctions.matchCount > 0 && (
+                    {sanctions && !sanctionsLoading && strongSanctionsMatches.length > 0 && (
                       <div className="rounded-md border border-destructive/50 bg-destructive/5 p-3 space-y-2">
                         <p className="text-sm font-medium text-destructive flex items-center gap-1">
                           <ShieldAlert className="h-4 w-4" />
-                          {sanctions.matchCount} potential OFAC match
-                          {sanctions.matchCount > 1 ? "es" : ""} — review required
+                          {strongSanctionsMatches.length} high-confidence OFAC match
+                          {strongSanctionsMatches.length > 1 ? "es" : ""} (≥95%) — review required
                         </p>
                         <ul className="text-xs space-y-1">
-                          {sanctions.matches.slice(0, 5).map((m, i) => (
+                          {strongSanctionsMatches.slice(0, 5).map((m, i) => (
                             <li key={i} className="flex justify-between gap-2">
                               <span className="truncate">
                                 <span className="font-medium">{m.name}</span>
@@ -1041,6 +1048,22 @@ export default function MarineTowQuote() {
                       </p>
                     </div>
                   )}
+                  </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ============ STEP 2: OPERATOR HISTORY ============ */}
+            {step === 2 && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-xl font-semibold">Operator History</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Operating experience and claims history.
+                  </p>
+                </div>
+                <div className="space-y-4">
                   <div className="space-y-2">
                     <Label>Years of experience (operating company)</Label>
                     <RadioGroup
@@ -1100,14 +1123,12 @@ export default function MarineTowQuote() {
                       />
                     </div>
                   )}
-                  </>
-                  )}
                 </div>
               </div>
             )}
 
-            {/* ============ STEP 3: VESSEL DETAILS ============ */}
-            {step === 3 && (
+            {/* ============ STEP 4: VESSEL DETAILS ============ */}
+            {step === 4 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Vessel Details</h2>
@@ -1166,8 +1187,8 @@ export default function MarineTowQuote() {
               </div>
             )}
 
-            {/* ============ STEP 4: VOYAGE DETAILS ============ */}
-            {step === 4 && (
+            {/* ============ STEP 5: VOYAGE DETAILS ============ */}
+            {step === 5 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Voyage Details</h2>
@@ -1317,8 +1338,8 @@ export default function MarineTowQuote() {
               </div>
             )}
 
-            {/* ============ STEP 5: ATTESTATIONS ============ */}
-            {step === 5 && (
+            {/* ============ STEP 6: ATTESTATIONS ============ */}
+            {step === 6 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Attestations</h2>
@@ -1386,8 +1407,8 @@ export default function MarineTowQuote() {
               </div>
             )}
 
-            {/* ============ STEP 6: DECLARATION ============ */}
-            {step === 6 && (
+            {/* ============ STEP 7: DECLARATION ============ */}
+            {step === 7 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Declaration</h2>
