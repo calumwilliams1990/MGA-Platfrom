@@ -1,0 +1,2 @@
+UPDATE auth.users SET email = 'calum_williams@hotmail.com' WHERE id = 'd9d198b1-dc05-4d98-b39b-f6d5fb6ba1b7';
+UPDATE public.profiles SET email = 'calum_williams@hotmail.com' WHERE id = 'd9d198b1-dc05-4d98-b39b-f6d5fb6ba1b7';
