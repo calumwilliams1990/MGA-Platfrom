@@ -905,9 +905,6 @@ export default function MarineTowQuote() {
                         onChange={(e) => update({ targetPrice: e.target.value })}
                         placeholder="e.g. 50000"
                       />
-                      <p className="text-xs text-muted-foreground">
-                        Target price will never lower the calculated premium.
-                      </p>
                     </div>
                   )}
                 </div>
