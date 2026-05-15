@@ -738,8 +738,8 @@ export default function MarineTowQuote() {
           )}
 
           <Card className="p-6">
-            {/* ============ STEP 1: COVER FUNDAMENTALS ============ */}
-            {step === 1 && (
+            {/* ============ STEP 2: COVER FUNDAMENTALS ============ */}
+            {step === 2 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Cover Fundamentals</h2>
