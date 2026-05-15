@@ -400,7 +400,11 @@ export default function MarineTowQuote() {
     referralReasons.push(`Policy duration (${policyDurationDays} days) exceeds 90`);
   }
   if (data.yearsExperience === "less_than_3") {
-    referralReasons.push("Operator has less than 3 years experience");
+    if (data.individualExperience === "less_than_3") {
+      declineReasons.push(
+        "Individual controlling the tow has less than 3 years experience",
+      );
+    }
   }
   if (data.claimsLast5Years === "yes") {
     referralReasons.push("Claims or circumstances in last 5 years");
