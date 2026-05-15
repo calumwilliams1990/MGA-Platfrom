@@ -139,8 +139,8 @@ const initial: MarineTowData = {
 };
 
 const steps = [
-  { id: 1, title: "Cover Fundamentals" },
-  { id: 2, title: "Policy Holder" },
+  { id: 1, title: "Policy Holder" },
+  { id: 2, title: "Cover Fundamentals" },
   { id: 3, title: "Vessel" },
   { id: 4, title: "Voyage" },
   { id: 5, title: "Attestations" },
@@ -426,16 +426,6 @@ export default function MarineTowQuote() {
     switch (step) {
       case 1:
         return (
-          !!data.inceptionDate &&
-          !!data.expiryDate &&
-          policyDurationDays > 0 &&
-          data.piProvider !== "" &&
-          data.setTargetPrice !== "" &&
-          (data.setTargetPrice === "no" ||
-            (data.setTargetPrice === "yes" && Number(data.targetPrice) > 0))
-        );
-      case 2:
-        return (
           data.insuredName.trim() !== "" &&
           data.address.trim() !== "" &&
           data.insuredCountry !== "" &&
@@ -443,6 +433,16 @@ export default function MarineTowQuote() {
           data.claimsLast5Years !== "" &&
           (data.claimsLast5Years === "no" ||
             data.claimsExplanation.trim() !== "")
+        );
+      case 2:
+        return (
+          !!data.inceptionDate &&
+          !!data.expiryDate &&
+          policyDurationDays > 0 &&
+          data.piProvider !== "" &&
+          data.setTargetPrice !== "" &&
+          (data.setTargetPrice === "no" ||
+            (data.setTargetPrice === "yes" && Number(data.targetPrice) > 0))
         );
       case 3:
         return (
@@ -738,8 +738,8 @@ export default function MarineTowQuote() {
           )}
 
           <Card className="p-6">
-            {/* ============ STEP 1: COVER FUNDAMENTALS ============ */}
-            {step === 1 && (
+            {/* ============ STEP 2: COVER FUNDAMENTALS ============ */}
+            {step === 2 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Cover Fundamentals</h2>
@@ -884,8 +884,8 @@ export default function MarineTowQuote() {
               </div>
             )}
 
-            {/* ============ STEP 2: POLICY HOLDER ============ */}
-            {step === 2 && (
+            {/* ============ STEP 1: POLICY HOLDER ============ */}
+            {step === 1 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Policy Holder Details</h2>
