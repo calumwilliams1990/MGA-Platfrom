@@ -461,7 +461,12 @@ export default function NewQuote() {
                 Complete the form to receive your quote
               </p>
             </div>
-            <Button 
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-sidebar-foreground/60">
+                {autoSaveStatus === "saving" && "Saving…"}
+                {autoSaveStatus === "saved" && "All changes saved"}
+              </span>
+              <Button 
               variant="outline" 
               className="bg-card text-card-foreground border-sidebar-border hover:bg-card/90 gap-2"
               onClick={() => savePolicy()}
@@ -470,6 +475,7 @@ export default function NewQuote() {
               <Save className="h-4 w-4" />
               {saving ? "Saving..." : "Save & Exit"}
             </Button>
+            </div>
           </div>
           
           {/* Progress Bar */}
