@@ -275,7 +275,7 @@ export default function MarineTowQuote() {
         insured_name: data.insuredName || null,
         vessel_name: data.vesselName || null,
         status: "draft",
-        payload: payload as unknown as Record<string, unknown>,
+        payload: JSON.parse(JSON.stringify(payload)),
       };
 
       if (quoteId) {
