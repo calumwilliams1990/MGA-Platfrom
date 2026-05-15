@@ -977,21 +977,21 @@ export default function MarineTowQuote() {
                         Sanctions check failed: {sanctionsError}
                       </p>
                     )}
-                    {sanctions && !sanctionsLoading && sanctions.matchCount === 0 && (
+                    {sanctions && !sanctionsLoading && strongSanctionsMatches.length === 0 && (
                       <p className="text-xs text-emerald-600 flex items-center gap-1">
                         <ShieldCheck className="h-3 w-3" />
-                        No OFAC matches found
+                        No high-confidence OFAC matches found
                       </p>
                     )}
-                    {sanctions && !sanctionsLoading && sanctions.matchCount > 0 && (
+                    {sanctions && !sanctionsLoading && strongSanctionsMatches.length > 0 && (
                       <div className="rounded-md border border-destructive/50 bg-destructive/5 p-3 space-y-2">
                         <p className="text-sm font-medium text-destructive flex items-center gap-1">
                           <ShieldAlert className="h-4 w-4" />
-                          {sanctions.matchCount} potential OFAC match
-                          {sanctions.matchCount > 1 ? "es" : ""} — review required
+                          {strongSanctionsMatches.length} high-confidence OFAC match
+                          {strongSanctionsMatches.length > 1 ? "es" : ""} (≥95%) — review required
                         </p>
                         <ul className="text-xs space-y-1">
-                          {sanctions.matches.slice(0, 5).map((m, i) => (
+                          {strongSanctionsMatches.slice(0, 5).map((m, i) => (
                             <li key={i} className="flex justify-between gap-2">
                               <span className="truncate">
                                 <span className="font-medium">{m.name}</span>
