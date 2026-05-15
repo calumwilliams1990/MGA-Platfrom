@@ -1378,6 +1378,31 @@ export default function MarineTowQuote() {
                     Confirm operating conditions. Unticked items refer to UW.
                   </p>
                 </div>
+                <Button
+                  variant="outline"
+                  className="w-full gap-2"
+                  onClick={() => {
+                    const updates: Partial<MarineTowData> = {
+                      vesselSurveyConfirmed: true,
+                      cargoLiabilityExcluded: true,
+                    };
+                    if (isTow) {
+                      updates.knockForKnock = true;
+                      updates.towagePlanApproved = true;
+                      updates.singleVessel = true;
+                    }
+                    if (isVoyage) {
+                      updates.appropriatePlan = true;
+                    }
+                    if (!data.crewCoverRequired) {
+                      updates.crewCoverExcluded = true;
+                    }
+                    update(updates);
+                  }}
+                >
+                  <Check className="h-4 w-4" />
+                  Agree All
+                </Button>
                 <div className="space-y-3">
                   {isTow && (
                     <>
