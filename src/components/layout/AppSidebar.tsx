@@ -10,6 +10,7 @@ import {
   ChevronDown,
   LogOut,
   MoreVertical,
+  ShieldCheck,
 } from "lucide-react";
 import {
   Sidebar,
@@ -35,6 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 const mainNavItems = [
   {
@@ -76,6 +78,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
+  const isAdmin = useIsAdmin();
   const [productsOpen, setProductsOpen] = useState(
     location.pathname.startsWith("/products")
   );
@@ -107,7 +110,12 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainNavItems.map((item) => (
+              {[
+                ...mainNavItems,
+                ...(isAdmin
+                  ? [{ title: "Administrator", url: "/admin", icon: ShieldCheck, children: undefined as any }]
+                  : []),
+              ].map((item) => (
                 <SidebarMenuItem key={item.title}>
                   {item.children ? (
                     <Collapsible

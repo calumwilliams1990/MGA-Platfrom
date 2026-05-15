@@ -11,6 +11,7 @@ import MarineTowQuote from "@/pages/MarineTowQuote";
 import QuoteSummary from "@/pages/QuoteSummary";
 import MyPolicies from "@/pages/MyPolicies";
 import NotFound from "@/pages/NotFound";
+import Admin from "@/pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/quote/summary" element={<QuoteSummary />} />
               <Route path="/products/marine-tow" element={<MarineTowQuote />} />
               <Route path="/policies" element={<MyPolicies />} />
+              <Route path="/admin" element={<Admin />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
