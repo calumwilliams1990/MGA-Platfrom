@@ -412,7 +412,7 @@ export default function MarineTowQuote() {
   // Attestation-based reasons only surface once the user has visited the
   // Attestations step (so we don't show "not confirmed" before the question
   // has even been asked).
-  if (maxStepReached >= 5) {
+  if (maxStepReached >= 6) {
     if (isTow) {
       if (!data.knockForKnock) referralReasons.push("Knock-for-knock not confirmed");
       if (!data.towagePlanApproved)
