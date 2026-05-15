@@ -1048,6 +1048,22 @@ export default function MarineTowQuote() {
                       </p>
                     </div>
                   )}
+                  </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ============ STEP 2: OPERATOR HISTORY ============ */}
+            {step === 2 && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-xl font-semibold">Operator History</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Operating experience and claims history.
+                  </p>
+                </div>
+                <div className="space-y-4">
                   <div className="space-y-2">
                     <Label>Years of experience (operating company)</Label>
                     <RadioGroup
@@ -1106,8 +1122,6 @@ export default function MarineTowQuote() {
                         rows={3}
                       />
                     </div>
-                  )}
-                  </>
                   )}
                 </div>
               </div>
