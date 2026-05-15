@@ -384,9 +384,11 @@ export default function MarineTowQuote() {
       referralReasons.push(`${label}: ${country} requires UW review`);
     }
   }
-  if (sanctions && sanctions.matchCount > 0) {
+  const strongSanctionsMatches =
+    sanctions?.matches.filter((m) => m.score >= SANCTIONS_THRESHOLD) ?? [];
+  if (strongSanctionsMatches.length > 0) {
     declineReasons.push(
-      `OFAC sanctions match (${sanctions.matchCount}) on insured name`,
+      `OFAC sanctions match (${strongSanctionsMatches.length}) on insured name`,
     );
   }
   if (data.inceptionDate && data.inceptionDate < startOfDay(new Date())) {
