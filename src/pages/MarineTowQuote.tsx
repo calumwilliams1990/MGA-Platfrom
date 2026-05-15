@@ -433,9 +433,17 @@ export default function MarineTowQuote() {
     switch (step) {
       case 1:
         return (
-          data.insuredName.trim() !== "" &&
-          data.address.trim() !== "" &&
           data.insuredCountry !== "" &&
+          !DECLINE_COUNTRIES.includes(data.insuredCountry) &&
+          data.insuredName.trim() !== "" &&
+          (
+            data.insuredCountry === "United Kingdom" ||
+            data.insuredCountry === "United States"
+              ? data.addressStreet.trim() !== "" &&
+                data.addressCity.trim() !== "" &&
+                data.addressPostcode.trim() !== ""
+              : data.address.trim() !== ""
+          ) &&
           data.yearsExperience !== "" &&
           data.claimsLast5Years !== "" &&
           (data.claimsLast5Years === "no" ||
