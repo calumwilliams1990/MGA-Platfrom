@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { format, addDays, differenceInCalendarDays, startOfDay } from "date-fns";
 import {
   CalendarIcon,
@@ -11,6 +12,7 @@ import {
   AlertTriangle,
   XCircle,
   Upload,
+  Save,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/layout/AppHeader";
@@ -191,6 +193,13 @@ function CountryFlag({ country }: { country: string }) {
 
 export default function MarineTowQuote() {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialId = searchParams.get("id");
+  const [quoteId, setQuoteId] = useState<string | null>(initialId);
+  const [saving, setSaving] = useState(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [hydrating, setHydrating] = useState(!!initialId);
   const [step, setStep] = useState(1);
   const [data, setData] = useState<MarineTowData>(initial);
   const [submitted, setSubmitted] = useState(false);
