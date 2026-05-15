@@ -85,7 +85,8 @@ export default function NewQuote() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const policyId = searchParams.get("id");
+  const initialPolicyId = searchParams.get("id");
+  const [policyId, setPolicyId] = useState<string | null>(initialPolicyId);
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   
@@ -95,7 +96,8 @@ export default function NewQuote() {
     stateData?.quoteData || initialQuoteData
   );
   const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(!!policyId && !stateData?.quoteData);
+  const [loading, setLoading] = useState(!!initialPolicyId && !stateData?.quoteData);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
 
   // Load existing policy data if editing (skip if we have state data from QuoteSummary)
   useEffect(() => {
