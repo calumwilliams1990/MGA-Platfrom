@@ -901,6 +901,43 @@ export default function MarineTowQuote() {
                   </p>
                 </div>
                 <div className="space-y-4">
+                  {/* 1. Address country FIRST — gates the rest of the step */}
+                  <div className="space-y-2">
+                    <Label>Address country</Label>
+                    <CountrySelect
+                      value={data.insuredCountry}
+                      onChange={(v) => {
+                        update({
+                          insuredCountry: v,
+                          // Reset structured address when country changes
+                          addressStreet: "",
+                          addressCity: "",
+                          addressPostcode: "",
+                          address: "",
+                        });
+                      }}
+                    />
+                    <CountryFlag country={data.insuredCountry} />
+                    {data.insuredCountry &&
+                      DECLINE_COUNTRIES.includes(data.insuredCountry) && (
+                        <div className="rounded-md border border-destructive/50 bg-destructive/5 p-3 flex items-start gap-2">
+                          <XCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+                          <div className="text-sm">
+                            <p className="font-medium text-destructive">
+                              {data.insuredCountry} is a sanctioned country — cover cannot be offered.
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Please choose a different country to continue.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                  </div>
+
+                  {/* Remaining fields gated on a non-declined country selection */}
+                  {data.insuredCountry &&
+                    !DECLINE_COUNTRIES.includes(data.insuredCountry) && (
+                  <>
                   <div className="space-y-2">
                     <Label htmlFor="insuredName">Named insured</Label>
                     <Input
@@ -960,24 +997,42 @@ export default function MarineTowQuote() {
                       </div>
                     )}
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Address</Label>
-                    <Textarea
-                      id="address"
-                      value={data.address}
-                      onChange={(e) => update({ address: e.target.value })}
-                      placeholder="Street, city, postcode"
-                      rows={2}
+                  {/* Address — autocomplete for UK/US, free text otherwise */}
+                  {(data.insuredCountry === "United Kingdom" ||
+                    data.insuredCountry === "United States") ? (
+                    <AddressLookup
+                      countryCode={
+                        data.insuredCountry === "United Kingdom" ? "gb" : "us"
+                      }
+                      street={data.addressStreet}
+                      city={data.addressCity}
+                      postcode={data.addressPostcode}
+                      onChange={(p) =>
+                        update({
+                          addressStreet: p.street,
+                          addressCity: p.city,
+                          addressPostcode: p.postcode,
+                          address: [p.street, p.city, p.postcode]
+                            .filter(Boolean)
+                            .join(", "),
+                        })
+                      }
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Address country</Label>
-                    <CountrySelect
-                      value={data.insuredCountry}
-                      onChange={(v) => update({ insuredCountry: v })}
-                    />
-                    <CountryFlag country={data.insuredCountry} />
-                  </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Label htmlFor="address">Full address</Label>
+                      <Textarea
+                        id="address"
+                        value={data.address}
+                        onChange={(e) => update({ address: e.target.value })}
+                        placeholder="Street, city, region, postcode"
+                        rows={3}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Address autocomplete is available for UK and US addresses only.
+                      </p>
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <Label>Years of experience (operating company)</Label>
                     <RadioGroup
@@ -1036,6 +1091,8 @@ export default function MarineTowQuote() {
                         rows={3}
                       />
                     </div>
+                  )}
+                  </>
                   )}
                 </div>
               </div>
