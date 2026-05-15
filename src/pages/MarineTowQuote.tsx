@@ -219,6 +219,114 @@ export default function MarineTowQuote() {
     setMaxStepReached((m) => Math.max(m, n));
   };
 
+  // Load existing draft when ?id= is present
+  useEffect(() => {
+    if (!initialId) return;
+    (async () => {
+      try {
+        const { data: row, error } = await supabase
+          .from("marine_tow_quotes")
+          .select("payload")
+          .eq("id", initialId)
+          .maybeSingle();
+        if (error) throw error;
+        if (row?.payload) {
+          const p = row.payload as Partial<MarineTowData> & {
+            inceptionDate?: string;
+            expiryDate?: string;
+          };
+          setData({
+            ...initial,
+            ...(p as object),
+            inceptionDate: p.inceptionDate ? new Date(p.inceptionDate) : undefined,
+            expiryDate: p.expiryDate ? new Date(p.expiryDate) : undefined,
+            supportingDocs: [],
+          } as MarineTowData);
+        }
+      } catch (e) {
+        toast({
+          title: "Error",
+          description: "Failed to load saved quote.",
+          variant: "destructive",
+        });
+      } finally {
+        setHydrating(false);
+      }
+    })();
+  }, [initialId, toast]);
+
+  const saveDraft = async (opts: { silent?: boolean; redirect?: boolean } = {}) => {
+    const { silent = false, redirect = true } = opts;
+    if (silent) setAutoSaveStatus("saving");
+    else setSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      // Strip File objects from payload (not serializable)
+      const { supportingDocs, ...rest } = data;
+      const payload = {
+        ...rest,
+        inceptionDate: data.inceptionDate ? data.inceptionDate.toISOString() : null,
+        expiryDate: data.expiryDate ? data.expiryDate.toISOString() : null,
+      };
+
+      const row = {
+        insured_name: data.insuredName || null,
+        vessel_name: data.vesselName || null,
+        status: "draft",
+        payload: payload as unknown as Record<string, unknown>,
+      };
+
+      if (quoteId) {
+        const { error } = await supabase
+          .from("marine_tow_quotes")
+          .update(row)
+          .eq("id", quoteId);
+        if (error) throw error;
+      } else {
+        const { data: inserted, error } = await supabase
+          .from("marine_tow_quotes")
+          .insert([{ ...row, user_id: user.id }])
+          .select("id")
+          .single();
+        if (error) throw error;
+        if (inserted?.id) setQuoteId(inserted.id);
+      }
+
+      if (silent) {
+        setAutoSaveStatus("saved");
+      } else {
+        toast({ title: "Quote saved", description: "Draft saved to My Policies." });
+        if (redirect) navigate("/policies");
+      }
+    } catch (e) {
+      if (silent) {
+        setAutoSaveStatus("idle");
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to save quote. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      if (!silent) setSaving(false);
+    }
+  };
+
+  // Auto-save with debounce
+  useEffect(() => {
+    if (hydrating || submitted) return;
+    if (!quoteId && !data.insuredName && !data.vesselName) return;
+    setAutoSaveStatus("saving");
+    const t = setTimeout(() => {
+      saveDraft({ silent: true, redirect: false });
+    }, 1500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, hydrating, submitted]);
+
   const runSanctionsCheck = async () => {
     const name = data.insuredName.trim();
     if (name.length < 2) return;
