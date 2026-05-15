@@ -65,7 +65,10 @@ interface MarineTowData {
   targetPrice: string;
   // 2. Policy Holder Details
   insuredName: string;
-  address: string;
+  address: string; // combined free-text address (used for non UK/US, and as a derived display elsewhere)
+  addressStreet: string;
+  addressCity: string;
+  addressPostcode: string;
   insuredCountry: string;
   yearsExperience: Experience;
   claimsLast5Years: YesNo;
@@ -108,6 +111,9 @@ const initial: MarineTowData = {
   targetPrice: "",
   insuredName: "",
   address: "",
+  addressStreet: "",
+  addressCity: "",
+  addressPostcode: "",
   insuredCountry: "",
   yearsExperience: "",
   claimsLast5Years: "",
