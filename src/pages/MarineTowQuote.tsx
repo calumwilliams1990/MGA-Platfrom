@@ -1490,7 +1490,7 @@ export default function MarineTowQuote() {
                 {step < steps.length ? (
                 <Button
                   onClick={() => goToStep(step + 1)}
-                  disabled={!stepValid()}
+                  disabled={!stepValid() || declineReasons.length > 0}
                 >
                   Continue
                 </Button>
