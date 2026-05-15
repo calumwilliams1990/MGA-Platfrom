@@ -1401,7 +1401,21 @@ export default function MarineTowQuote() {
                 <ChevronLeft className="h-4 w-4" />
                 Back
               </Button>
-              {step < steps.length ? (
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-muted-foreground">
+                  {autoSaveStatus === "saving" && "Saving…"}
+                  {autoSaveStatus === "saved" && "Saved"}
+                </span>
+                <Button
+                  variant="outline"
+                  onClick={() => saveDraft()}
+                  disabled={saving}
+                  className="gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  {saving ? "Saving..." : "Save & Exit"}
+                </Button>
+                {step < steps.length ? (
                 <Button
                   onClick={() => goToStep(step + 1)}
                   disabled={!stepValid()}
@@ -1416,6 +1430,7 @@ export default function MarineTowQuote() {
                   Generate Quote
                 </Button>
               )}
+              </div>
             </div>
           </Card>
         </div>
