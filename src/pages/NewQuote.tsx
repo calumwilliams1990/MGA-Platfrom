@@ -343,8 +343,13 @@ export default function NewQuote() {
     };
   };
 
-  const savePolicy = async () => {
-    setSaving(true);
+  const savePolicy = async (opts: { silent?: boolean; redirect?: boolean } = {}) => {
+    const { silent = false, redirect = true } = opts;
+    if (silent) {
+      setAutoSaveStatus("saving");
+    } else {
+      setSaving(true);
+    }
     try {
       const currentReferralStatus = checkReferralStatus();
       const currentPremium = calculatePremium();
@@ -383,32 +388,60 @@ export default function NewQuote() {
           .eq("id", policyId);
         error = result.error;
       } else {
-        const result = await supabase.from("policies").insert([{ ...policyData, user_id: user.id }]);
+        const result = await supabase
+          .from("policies")
+          .insert([{ ...policyData, user_id: user.id }])
+          .select("id")
+          .single();
         error = result.error;
+        if (result.data?.id) {
+          setPolicyId(result.data.id);
+        }
       }
 
       if (error) throw error;
 
-      toast({
-        title: "Policy saved",
-        description: "Your policy has been saved as a draft.",
-      });
-
-      navigate("/policies");
+      if (silent) {
+        setAutoSaveStatus("saved");
+      } else {
+        toast({
+          title: "Policy saved",
+          description: "Your policy has been saved as a draft.",
+        });
+        if (redirect) navigate("/policies");
+      }
     } catch (error) {
       logger.error("Error saving policy:", error);
-      toast({
-        title: "Error",
-        description: "Failed to save policy. Please try again.",
-        variant: "destructive",
-      });
+      if (silent) {
+        setAutoSaveStatus("idle");
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to save policy. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
-      setSaving(false);
+      if (!silent) setSaving(false);
     }
   };
 
   const referralStatus = checkReferralStatus();
   const premium = calculatePremium();
+
+  // Auto-save: debounce changes and persist silently while editing
+  useEffect(() => {
+    if (loading) return;
+    // Don't auto-save an empty new quote
+    if (!policyId && !quoteData.insuredName && !quoteData.occupancyType) return;
+
+    setAutoSaveStatus("saving");
+    const timer = setTimeout(() => {
+      savePolicy({ silent: true, redirect: false });
+    }, 1500);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quoteData, loading]);
 
   return (
     <>
