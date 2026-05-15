@@ -760,8 +760,8 @@ export default function MarineTowQuote() {
           )}
 
           <Card className="p-6">
-            {/* ============ STEP 2: COVER FUNDAMENTALS ============ */}
-            {step === 2 && (
+            {/* ============ STEP 3: COVER FUNDAMENTALS ============ */}
+            {step === 3 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Cover Fundamentals</h2>
@@ -1113,8 +1113,8 @@ export default function MarineTowQuote() {
               </div>
             )}
 
-            {/* ============ STEP 3: VESSEL DETAILS ============ */}
-            {step === 3 && (
+            {/* ============ STEP 4: VESSEL DETAILS ============ */}
+            {step === 4 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Vessel Details</h2>
@@ -1173,8 +1173,8 @@ export default function MarineTowQuote() {
               </div>
             )}
 
-            {/* ============ STEP 4: VOYAGE DETAILS ============ */}
-            {step === 4 && (
+            {/* ============ STEP 5: VOYAGE DETAILS ============ */}
+            {step === 5 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Voyage Details</h2>
@@ -1324,8 +1324,8 @@ export default function MarineTowQuote() {
               </div>
             )}
 
-            {/* ============ STEP 5: ATTESTATIONS ============ */}
-            {step === 5 && (
+            {/* ============ STEP 6: ATTESTATIONS ============ */}
+            {step === 6 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Attestations</h2>
@@ -1393,8 +1393,8 @@ export default function MarineTowQuote() {
               </div>
             )}
 
-            {/* ============ STEP 6: DECLARATION ============ */}
-            {step === 6 && (
+            {/* ============ STEP 7: DECLARATION ============ */}
+            {step === 7 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Declaration</h2>
