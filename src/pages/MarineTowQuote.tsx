@@ -447,13 +447,16 @@ export default function MarineTowQuote() {
                 data.addressCity.trim() !== "" &&
                 data.addressPostcode.trim() !== ""
               : data.address.trim() !== ""
-          ) &&
+          )
+        );
+      case 2:
+        return (
           data.yearsExperience !== "" &&
           data.claimsLast5Years !== "" &&
           (data.claimsLast5Years === "no" ||
             data.claimsExplanation.trim() !== "")
         );
-      case 2:
+      case 3:
         return (
           !!data.inceptionDate &&
           !!data.expiryDate &&
@@ -463,7 +466,7 @@ export default function MarineTowQuote() {
           (data.setTargetPrice === "no" ||
             (data.setTargetPrice === "yes" && Number(data.targetPrice) > 0))
         );
-      case 3:
+      case 4:
         return (
           data.vesselName.trim() !== "" &&
           data.flagCountry !== "" &&
@@ -471,7 +474,7 @@ export default function MarineTowQuote() {
           Number(data.grossTonnage) > 0 &&
           data.vesselType.trim() !== ""
         );
-      case 4:
+      case 5:
         return (
           data.limit !== "" &&
           data.departureCountry !== "" &&
@@ -480,9 +483,9 @@ export default function MarineTowQuote() {
           (isTow ? data.mwsSurveyor !== "" : true) &&
           (!data.portCoverRequired || data.portCoverDetails.trim() !== "")
         );
-      case 5:
-        return true; // attestations are advisory; unticked → referral, not block
       case 6:
+        return true; // attestations are advisory; unticked → referral, not block
+      case 7:
         return (
           data.declarationConfirmed &&
           (!data.triggerManualReferral ||
