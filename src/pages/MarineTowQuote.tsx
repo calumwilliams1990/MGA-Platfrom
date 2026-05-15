@@ -139,8 +139,8 @@ const initial: MarineTowData = {
 };
 
 const steps = [
-  { id: 1, title: "Cover Fundamentals" },
-  { id: 2, title: "Policy Holder" },
+  { id: 1, title: "Policy Holder" },
+  { id: 2, title: "Cover Fundamentals" },
   { id: 3, title: "Vessel" },
   { id: 4, title: "Voyage" },
   { id: 5, title: "Attestations" },
