@@ -72,6 +72,7 @@ interface MarineTowData {
   addressPostcode: string;
   insuredCountry: string;
   yearsExperience: Experience;
+  individualExperience: Experience;
   claimsLast5Years: YesNo;
   claimsExplanation: string;
   // 3. Vessel Details
@@ -117,6 +118,7 @@ const initial: MarineTowData = {
   addressPostcode: "",
   insuredCountry: "",
   yearsExperience: "",
+  individualExperience: "",
   claimsLast5Years: "",
   claimsExplanation: "",
   vesselName: "",
