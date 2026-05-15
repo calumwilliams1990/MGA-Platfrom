@@ -884,8 +884,8 @@ export default function MarineTowQuote() {
               </div>
             )}
 
-            {/* ============ STEP 2: POLICY HOLDER ============ */}
-            {step === 2 && (
+            {/* ============ STEP 1: POLICY HOLDER ============ */}
+            {step === 1 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold">Policy Holder Details</h2>
