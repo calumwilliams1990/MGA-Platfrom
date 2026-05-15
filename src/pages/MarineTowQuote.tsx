@@ -1095,6 +1095,35 @@ export default function MarineTowQuote() {
                       </div>
                     </RadioGroup>
                   </div>
+                  {data.yearsExperience === "less_than_3" && (
+                    <div className="space-y-2">
+                      <Label>
+                        How many years of experience does the individual
+                        controlling the tow have in the industry?
+                      </Label>
+                      <Select
+                        value={data.individualExperience}
+                        onValueChange={(v) =>
+                          update({ individualExperience: v as Experience })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select experience" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="less_than_3">Less than 3 years</SelectItem>
+                          <SelectItem value="three_to_five">3 – 5 years</SelectItem>
+                          <SelectItem value="over_5">Over 5 years</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {data.individualExperience === "less_than_3" && (
+                        <p className="text-sm text-destructive">
+                          Risk declined: individual controlling the tow must
+                          have at least 3 years of industry experience.
+                        </p>
+                      )}
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <Label>Claims or circumstances in last 5 years?</Label>
                     <p className="text-xs text-muted-foreground">
