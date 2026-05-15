@@ -464,7 +464,7 @@ export default function NewQuote() {
             <Button 
               variant="outline" 
               className="bg-card text-card-foreground border-sidebar-border hover:bg-card/90 gap-2"
-              onClick={savePolicy}
+              onClick={() => savePolicy()}
               disabled={saving}
             >
               <Save className="h-4 w-4" />
