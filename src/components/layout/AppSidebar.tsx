@@ -113,7 +113,7 @@ export function AppSidebar() {
               {[
                 ...mainNavItems,
                 ...(isAdmin
-                  ? [{ title: "Administrator", url: "/admin", icon: ShieldCheck } as const]
+                  ? [{ title: "Administrator", url: "/admin", icon: ShieldCheck, children: undefined as any }]
                   : []),
               ].map((item) => (
                 <SidebarMenuItem key={item.title}>
