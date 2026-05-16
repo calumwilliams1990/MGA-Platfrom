@@ -261,6 +261,9 @@ export default function MarineTowQuote() {
   const [data, setData] = useState<MarineTowData>(initial);
   const [submitted, setSubmitted] = useState(false);
   const [maxStepReached, setMaxStepReached] = useState(1);
+  const [rateLoading, setRateLoading] = useState(false);
+  const [rateError, setRateError] = useState<string | null>(null);
+  const [rateResult, setRateResult] = useState<RateResponse | null>(null);
 
   type SanctionMatch = { id: string; name: string; type: string; program: string; score: number };
   type SanctionsResult = { matchCount: number; matches: SanctionMatch[]; checkedAt: string };
