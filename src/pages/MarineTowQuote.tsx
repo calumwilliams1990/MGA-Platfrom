@@ -576,6 +576,11 @@ export default function MarineTowQuote() {
         : "";
 
     const productData = {
+      state: stateCode,
+      naics_code: "483211",
+      years_in_business: experienceToYears(data.yearsExperience),
+      years_experience: data.yearsExperience,
+      deductible,
       pi_provider: data.piProvider,
       target_price:
         data.setTargetPrice === "yes" ? Number(data.targetPrice) : null,
@@ -630,13 +635,9 @@ export default function MarineTowQuote() {
       broker_id: "demo-broker",
       submission_channel: "ui",
       insured_name: data.insuredName,
-      state: stateCode,
-      naics_code: "483211",
-      years_in_business: experienceToYears(data.yearsExperience),
       line_of_business: "marine_tow",
       effective_date: inception,
       requested_limit: limitNum,
-      deductible: 0,
       product_data: productData,
     };
 
