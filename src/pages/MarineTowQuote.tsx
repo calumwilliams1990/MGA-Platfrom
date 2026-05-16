@@ -689,6 +689,21 @@ export default function MarineTowQuote() {
         currency: "USD",
         maximumFractionDigits: 0,
       }).format(n);
+    const parseNum = (v: number | string | undefined): number => {
+      if (v === undefined || v === null) return NaN;
+      if (typeof v === "number") return v;
+      const parsed = parseFloat(v);
+      return isNaN(parsed) ? NaN : parsed;
+    };
+    const fmtRate = (v: number | string | undefined) => {
+      const n = parseNum(v);
+      if (isNaN(n)) return "—";
+      return `${(n * 100).toFixed(3)}%`;
+    };
+    const fmtBasis = (v: string | undefined) => {
+      if (!v) return "—";
+      return v.charAt(0).toUpperCase() + v.slice(1);
+    };
 
     return (
       <>
