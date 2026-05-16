@@ -8,6 +8,7 @@ export interface AddressParts {
   street: string;
   city: string;
   postcode: string;
+  state?: string;
 }
 
 interface NominatimResult {
@@ -42,6 +43,7 @@ function toParts(r: NominatimResult): AddressParts {
     street,
     city,
     postcode: a.postcode ?? "",
+    state: a.state ?? "",
   };
 }
 
