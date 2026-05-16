@@ -668,6 +668,27 @@ export default function MarineTowQuote() {
   };
 
   if (submitted) {
+    const resetAll = () => {
+      setData(initial);
+      setSubmitted(false);
+      setStep(1);
+      setSanctions(null);
+      setMaxStepReached(1);
+      setRateResult(null);
+      setRateError(null);
+    };
+    const editQuote = () => {
+      setSubmitted(false);
+      setRateResult(null);
+      setRateError(null);
+    };
+    const fmtMoney = (n: number) =>
+      new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0,
+      }).format(n);
+
     return (
       <>
         <AppHeader
@@ -679,51 +700,165 @@ export default function MarineTowQuote() {
         />
         <div className="flex-1 overflow-auto bg-sidebar">
           <div className="p-6 max-w-2xl mx-auto">
-            <Card className="p-8 text-center space-y-4">
-              <div className="mx-auto h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
-                <Check className="h-6 w-6 text-success" />
-              </div>
-              <h1 className="text-2xl font-bold">Quote submitted</h1>
-              <p className="text-muted-foreground">
-                {referralReasons.length > 0
-                  ? "Sent to underwriter for review."
-                  : "The Marine Tow quote payload has been logged. Rate API wiring coming next."}
-              </p>
-              {referralReasons.length > 0 && (
-                <div className="text-left rounded-md border border-warning/40 bg-warning/5 p-3">
-                  <p className="text-sm font-medium text-warning mb-2 flex items-center gap-1">
-                    <AlertTriangle className="h-4 w-4" /> Referral reasons
-                  </p>
-                  <ul className="text-xs space-y-1 list-disc pl-5">
-                    {referralReasons.map((r) => (
-                      <li key={r}>{r}</li>
-                    ))}
-                  </ul>
+            {rateLoading && (
+              <Card className="p-8 text-center space-y-4">
+                <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+                <h1 className="text-xl font-semibold">Rating your submission…</h1>
+                <p className="text-muted-foreground text-sm">
+                  Contacting the rating engine. This usually takes a few seconds.
+                </p>
+              </Card>
+            )}
+
+            {!rateLoading && rateError && (
+              <Card className="p-8 space-y-4">
+                <div className="mx-auto h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
+                  <XCircle className="h-6 w-6 text-destructive" />
                 </div>
-              )}
-              <div className="flex justify-center gap-3 pt-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSubmitted(false);
-                    setStep(1);
-                  }}
-                >
-                  Edit quote
-                </Button>
-                <Button
-                  onClick={() => {
-                    setData(initial);
-                    setSubmitted(false);
-                    setStep(1);
-                    setSanctions(null);
-                    setMaxStepReached(1);
-                  }}
-                >
-                  New quote
-                </Button>
-              </div>
-            </Card>
+                <h1 className="text-2xl font-bold text-center">Rating failed</h1>
+                <p className="text-sm text-muted-foreground text-center">
+                  We couldn't get a rate from the API.
+                </p>
+                <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive break-words">
+                  {rateError}
+                </div>
+                <div className="flex justify-center gap-3 pt-2">
+                  <Button variant="outline" onClick={editQuote}>
+                    Edit quote
+                  </Button>
+                  <Button onClick={handleSubmit}>Try again</Button>
+                </div>
+              </Card>
+            )}
+
+            {!rateLoading && !rateError && rateResult && rateResult.status === "quoted" && (
+              <Card className="p-8 space-y-5">
+                <div className="mx-auto h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
+                  <Check className="h-6 w-6 text-success" />
+                </div>
+                <div className="text-center space-y-1">
+                  <h1 className="text-2xl font-bold">Quote ready</h1>
+                  <p className="text-muted-foreground text-sm">
+                    Indicative premium returned by the rating engine.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="rounded-md border p-4 text-center">
+                    <p className="text-xs text-muted-foreground">Annual premium</p>
+                    <p className="text-2xl font-bold text-primary mt-1">
+                      {typeof rateResult.annual_premium === "number"
+                        ? fmtMoney(rateResult.annual_premium)
+                        : "—"}
+                    </p>
+                  </div>
+                  <div className="rounded-md border p-4 text-center">
+                    <p className="text-xs text-muted-foreground">Rate</p>
+                    <p className="text-lg font-semibold mt-1">
+                      {typeof rateResult.rate === "number"
+                        ? rateResult.rate.toLocaleString(undefined, {
+                            maximumFractionDigits: 4,
+                          })
+                        : "—"}
+                    </p>
+                  </div>
+                  <div className="rounded-md border p-4 text-center">
+                    <p className="text-xs text-muted-foreground">Rating basis</p>
+                    <p className="text-sm font-medium mt-1">
+                      {rateResult.rating_basis ?? "—"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex justify-center gap-3 pt-2">
+                  <Button variant="outline" onClick={editQuote}>
+                    Edit quote
+                  </Button>
+                  <Button onClick={resetAll}>New quote</Button>
+                </div>
+              </Card>
+            )}
+
+            {!rateLoading && !rateError && rateResult && rateResult.status === "referred" && (
+              <Card className="p-8 space-y-4">
+                <div className="mx-auto h-12 w-12 rounded-full bg-warning/10 flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-warning" />
+                </div>
+                <div className="text-center space-y-1">
+                  <h1 className="text-2xl font-bold">Referred to underwriter</h1>
+                  <p className="text-muted-foreground text-sm">
+                    {rateResult.message ??
+                      "Your submission is being reviewed by an underwriter"}
+                  </p>
+                </div>
+                {rateResult.referral_reasons && rateResult.referral_reasons.length > 0 && (
+                  <div className="rounded-md border border-warning/40 bg-warning/5 p-3">
+                    <p className="text-sm font-medium text-warning mb-2">
+                      Referral reasons
+                    </p>
+                    <ul className="text-xs space-y-1 list-disc pl-5">
+                      {rateResult.referral_reasons.map((r) => (
+                        <li key={r}>{r}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <div className="flex justify-center gap-3 pt-2">
+                  <Button variant="outline" onClick={editQuote}>
+                    Edit quote
+                  </Button>
+                  <Button onClick={resetAll}>New quote</Button>
+                </div>
+              </Card>
+            )}
+
+            {!rateLoading && !rateError && rateResult && rateResult.status === "declined" && (
+              <Card className="p-8 space-y-4">
+                <div className="mx-auto h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
+                  <XCircle className="h-6 w-6 text-destructive" />
+                </div>
+                <div className="text-center space-y-1">
+                  <h1 className="text-2xl font-bold">Submission declined</h1>
+                  <p className="text-muted-foreground text-sm">
+                    {rateResult.message ??
+                      "This risk does not meet our underwriting appetite."}
+                  </p>
+                </div>
+                {rateResult.decline_reasons && rateResult.decline_reasons.length > 0 && (
+                  <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3">
+                    <p className="text-sm font-medium text-destructive mb-2">
+                      Decline reasons
+                    </p>
+                    <ul className="text-xs space-y-1 list-disc pl-5">
+                      {rateResult.decline_reasons.map((r) => (
+                        <li key={r}>{r}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <div className="flex justify-center gap-3 pt-2">
+                  <Button variant="outline" onClick={editQuote}>
+                    Edit quote
+                  </Button>
+                  <Button onClick={resetAll}>New quote</Button>
+                </div>
+              </Card>
+            )}
+
+            {!rateLoading && !rateError && rateResult && !["quoted", "referred", "declined"].includes(rateResult.status) && (
+              <Card className="p-8 space-y-4">
+                <h1 className="text-xl font-semibold text-center">
+                  Unexpected response
+                </h1>
+                <pre className="text-xs bg-muted rounded-md p-3 overflow-auto">
+                  {JSON.stringify(rateResult, null, 2)}
+                </pre>
+                <div className="flex justify-center gap-3">
+                  <Button variant="outline" onClick={editQuote}>
+                    Edit quote
+                  </Button>
+                  <Button onClick={resetAll}>New quote</Button>
+                </div>
+              </Card>
+            )}
           </div>
         </div>
       </>
