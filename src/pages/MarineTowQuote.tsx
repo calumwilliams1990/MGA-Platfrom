@@ -70,6 +70,7 @@ interface MarineTowData {
   addressStreet: string;
   addressCity: string;
   addressPostcode: string;
+  addressState: string;
   insuredCountry: string;
   yearsExperience: Experience;
   individualExperience: Experience;
@@ -116,6 +117,7 @@ const initial: MarineTowData = {
   addressStreet: "",
   addressCity: "",
   addressPostcode: "",
+  addressState: "",
   insuredCountry: "",
   yearsExperience: "",
   individualExperience: "",
