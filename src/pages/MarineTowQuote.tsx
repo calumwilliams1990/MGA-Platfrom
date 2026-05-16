@@ -1034,6 +1034,7 @@ export default function MarineTowQuote() {
                           addressStreet: p.street,
                           addressCity: p.city,
                           addressPostcode: p.postcode,
+                          addressState: p.state ?? "",
                           address: [p.street, p.city, p.postcode]
                             .filter(Boolean)
                             .join(", "),
