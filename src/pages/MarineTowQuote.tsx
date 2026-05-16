@@ -935,6 +935,7 @@ export default function MarineTowQuote() {
                           addressStreet: "",
                           addressCity: "",
                           addressPostcode: "",
+                          addressState: "",
                           address: "",
                         });
                       }}
