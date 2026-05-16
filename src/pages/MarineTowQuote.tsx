@@ -762,25 +762,21 @@ export default function MarineTowQuote() {
                   <div className="rounded-md border p-4 text-center">
                     <p className="text-xs text-muted-foreground">Annual premium</p>
                     <p className="text-2xl font-bold text-primary mt-1">
-                      {typeof rateResult.annual_premium === "number"
-                        ? fmtMoney(rateResult.annual_premium)
+                      {!isNaN(parseNum(rateResult.annual_premium))
+                        ? fmtMoney(parseNum(rateResult.annual_premium))
                         : "—"}
                     </p>
                   </div>
                   <div className="rounded-md border p-4 text-center">
                     <p className="text-xs text-muted-foreground">Rate</p>
                     <p className="text-lg font-semibold mt-1">
-                      {typeof rateResult.rate === "number"
-                        ? rateResult.rate.toLocaleString(undefined, {
-                            maximumFractionDigits: 4,
-                          })
-                        : "—"}
+                      {fmtRate(rateResult.rate)}
                     </p>
                   </div>
                   <div className="rounded-md border p-4 text-center">
                     <p className="text-xs text-muted-foreground">Rating basis</p>
                     <p className="text-sm font-medium mt-1">
-                      {rateResult.rating_basis ?? "—"}
+                      {fmtBasis(rateResult.rating_basis)}
                     </p>
                   </div>
                 </div>
