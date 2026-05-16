@@ -53,6 +53,51 @@ import {
   deductibleForLimit,
 } from "@/lib/marineTowOptions";
 
+const RATE_API_URL =
+  "https://velonix-platform-production-deba.up.railway.app/api/v1/rate";
+
+const US_STATE_CODES: Record<string, string> = {
+  alabama: "AL", alaska: "AK", arizona: "AZ", arkansas: "AR", california: "CA",
+  colorado: "CO", connecticut: "CT", delaware: "DE", "district of columbia": "DC",
+  florida: "FL", georgia: "GA", hawaii: "HI", idaho: "ID", illinois: "IL",
+  indiana: "IN", iowa: "IA", kansas: "KS", kentucky: "KY", louisiana: "LA",
+  maine: "ME", maryland: "MD", massachusetts: "MA", michigan: "MI",
+  minnesota: "MN", mississippi: "MS", missouri: "MO", montana: "MT",
+  nebraska: "NE", nevada: "NV", "new hampshire": "NH", "new jersey": "NJ",
+  "new mexico": "NM", "new york": "NY", "north carolina": "NC",
+  "north dakota": "ND", ohio: "OH", oklahoma: "OK", oregon: "OR",
+  pennsylvania: "PA", "rhode island": "RI", "south carolina": "SC",
+  "south dakota": "SD", tennessee: "TN", texas: "TX", utah: "UT",
+  vermont: "VT", virginia: "VA", washington: "WA", "west virginia": "WV",
+  wisconsin: "WI", wyoming: "WY",
+};
+
+function toStateCode(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed) return "";
+  if (trimmed.length === 2) return trimmed.toUpperCase();
+  return US_STATE_CODES[trimmed.toLowerCase()] ?? "";
+}
+
+function experienceToYears(e: Experience): number {
+  if (e === "less_than_3") return 2;
+  if (e === "three_to_five") return 4;
+  if (e === "over_5") return 6;
+  return 0;
+}
+
+type RateStatus = "quoted" | "referred" | "declined";
+interface RateResponse {
+  status: RateStatus;
+  annual_premium?: number;
+  rate?: number;
+  rating_basis?: string;
+  referral_reasons?: string[];
+  decline_reasons?: string[];
+  message?: string;
+  [k: string]: unknown;
+}
+
 type YesNo = "yes" | "no" | "";
 type TripType = "delivery_voyage" | "tow" | "demolition_voyage" | "";
 type Experience = "less_than_3" | "three_to_five" | "over_5" | "";
