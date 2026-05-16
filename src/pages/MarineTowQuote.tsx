@@ -554,7 +554,7 @@ export default function MarineTowQuote() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (declineReasons.length > 0) {
       toast({
         title: "Cannot submit — risk declined",
@@ -570,23 +570,28 @@ export default function MarineTowQuote() {
       ? format(data.expiryDate, "yyyy-MM-dd")
       : "";
 
-    const payload = {
-      line_of_business: "marine_tow",
-      cover_fundamentals: {
-        inception_date: inception,
-        expiry_date: expiry,
-        policy_duration_days: policyDurationDays,
-        pi_provider: data.piProvider,
-        target_price: data.setTargetPrice === "yes" ? Number(data.targetPrice) : null,
+    const stateCode =
+      data.insuredCountry === "United States"
+        ? toStateCode(data.addressState)
+        : "";
+
+    const productData = {
+      pi_provider: data.piProvider,
+      target_price:
+        data.setTargetPrice === "yes" ? Number(data.targetPrice) : null,
+      expiry_date: expiry,
+      policy_duration_days: policyDurationDays,
+      insured_country: data.insuredCountry,
+      insured_address: {
+        street: data.addressStreet || null,
+        city: data.addressCity || null,
+        postcode: data.addressPostcode || null,
+        state: data.addressState || null,
+        full_address: data.address || null,
       },
-      policyholder: {
-        insured_name: data.insuredName,
-        address: data.address,
-        country: data.insuredCountry,
-        years_experience: data.yearsExperience,
-        claims_last_5_years: data.claimsLast5Years === "yes",
-        claims_explanation: data.claimsExplanation || null,
-      },
+      individual_experience: data.individualExperience || null,
+      claims_last_5_years: data.claimsLast5Years === "yes",
+      claims_explanation: data.claimsExplanation || null,
       vessel: {
         name: data.vesselName,
         flag: data.flagCountry,
@@ -595,8 +600,6 @@ export default function MarineTowQuote() {
         vessel_type: data.vesselType,
       },
       voyage: {
-        limit: limitNum,
-        deductible,
         mws_surveyor: data.mwsSurveyor || null,
         departure_country: data.departureCountry,
         delivery_country: data.deliveryCountry,
@@ -620,22 +623,48 @@ export default function MarineTowQuote() {
         manual_referral_notes: data.manualReferralNotes || null,
         supporting_doc_count: data.supportingDocs.length,
       },
-      referral_required: referralReasons.length > 0,
-      referral_reasons: referralReasons,
+      ui_referral_reasons: referralReasons,
     };
 
-    console.log("Marine Tow rate payload:", payload);
+    const payload = {
+      broker_id: "demo-broker",
+      submission_channel: "ui",
+      insured_name: data.insuredName,
+      state: stateCode,
+      naics_code: "483211",
+      years_in_business: experienceToYears(data.yearsExperience),
+      line_of_business: "marine_tow",
+      effective_date: inception,
+      requested_limit: limitNum,
+      deductible: 0,
+      product_data: productData,
+    };
+
+    setRateLoading(true);
+    setRateError(null);
+    setRateResult(null);
     setSubmitted(true);
-    toast({
-      title:
-        referralReasons.length > 0
-          ? "Quote submitted — referred to underwriter"
-          : "Quote submitted",
-      description:
-        referralReasons.length > 0
-          ? `${referralReasons.length} referral reason${referralReasons.length > 1 ? "s" : ""}`
-          : "Payload logged to console.",
-    });
+    try {
+      const res = await fetch(RATE_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(
+          `Rating API returned ${res.status}${text ? `: ${text}` : ""}`,
+        );
+      }
+      const result = (await res.json()) as RateResponse;
+      setRateResult(result);
+    } catch (e) {
+      setRateError(
+        e instanceof Error ? e.message : "Failed to reach rating API",
+      );
+    } finally {
+      setRateLoading(false);
+    }
   };
 
   if (submitted) {
