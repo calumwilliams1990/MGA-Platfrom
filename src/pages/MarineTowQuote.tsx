@@ -89,8 +89,8 @@ function experienceToYears(e: Experience): number {
 type RateStatus = "quoted" | "referred" | "declined";
 interface RateResponse {
   status: RateStatus;
-  annual_premium?: number;
-  rate?: number;
+  annual_premium?: number | string;
+  rate?: number | string;
   rating_basis?: string;
   referral_reasons?: string[];
   decline_reasons?: string[];
