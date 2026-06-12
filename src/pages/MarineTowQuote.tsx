@@ -579,7 +579,8 @@ export default function MarineTowQuote() {
       state: stateCode,
       naics_code: "483211",
       years_in_business: experienceToYears(data.yearsExperience),
-      years_experience: data.yearsExperience,
+      years_experience: experienceToYears(data.yearsExperience),
+      years_experience_band: data.yearsExperience,
       deductible,
       pi_provider: data.piProvider,
       target_price:
